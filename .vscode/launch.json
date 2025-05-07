@@ -4,15 +4,14 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        { 
+        
+        {
             "type": "java",
             "name": "GameApp",
             "request": "launch",
             "mainClass": "com.game.GameApp",
-            "vmArgs": "--module-path /Users/yarexzigonzalez/Downloads/javafx-sdk-24.0.1/lib --add-modules javafx.controls,javafx.fxml",
-            "projectName": "gameproject"
+            "projectName": "2DGame",
+            "vmArgs": "--module-path /Users/yarexzigonzalez/Downloads/javafx-sdk-24.0.1/lib --add-modules javafx.controls,javafx.fxml"
         }
-
-       
     ]
 }

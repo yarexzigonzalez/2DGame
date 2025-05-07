@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.gameproject</groupId>
+    <groupId>com.game</groupId> <!-- com.game or com.gameproject -->
     <artifactId>game</artifactId> <!-- Change name based off project name, 
     name here of project is demo -->
     <version>1.0-SNAPSHOT</version>
@@ -45,7 +45,9 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.example.App</mainClass> 
+                    <mainClass>com.game.GameApp</mainClass> 
+                    <!-- Change this to your main class, i 
+                    forgot to change to com.game.GameApp, NOT com.example.App -->
                     <platform>mac-aarch64</platform> 
                 </configuration>
                 <executions>

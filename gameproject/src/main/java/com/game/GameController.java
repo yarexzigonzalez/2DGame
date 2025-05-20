@@ -9,6 +9,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.Rectangle;
 
 public class GameController {
+    private Player playerStats = new Player(); // Create a new player object    
     @FXML
     private Rectangle player; // Matches element type in FXML
     @FXML
@@ -134,7 +135,7 @@ public class GameController {
     }
 
     private void updateHealthLabel() {
-        healthLabel.setText("Health: " + health);
+        healthLabel.setText("Health: " + playerStats.currentHealth + "/" + playerStats.maxHealth);
     }
 
     

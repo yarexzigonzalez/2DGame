@@ -2,6 +2,7 @@ package com.game;
 
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
@@ -44,72 +45,64 @@ public class GameController {
         timer.start();
     }
 
-    
+
+    /* applyGravity() called every frame to add gravity by increasing vertical speed, 
+    predicts where player will move next, 
+    detects if player will land on platfrom, 
+    places player to platform or ground if collision occurs
+    (used Bounds (geometry rectangles) to make more accurate collision checks)
+    */
     private void applyGravity() {
-        velocityY += gravity; // Apply gravity to the vertical velocity
-
-        // Limit the maximum falling speed
-        if (velocityY > maxFallSpeed) {
-            velocityY = maxFallSpeed; // Cap the falling speed
+        // Calculate where player will move next vertically (Y position)
+        double nextY = player.getY() + velocityY;
+    
+        // Get bounds for next frame
+        Bounds playerBounds = player.getBoundsInParent();
+        Bounds platformBounds = floatingPlatform.getBoundsInParent();
+    
+        // Check if player is horizontally within platform's width
+        boolean horizontal = playerBounds.getMaxX() > platformBounds.getMinX() &&
+                             playerBounds.getMinX() < platformBounds.getMaxX();
+    
+        // Predict next bottom Y position
+        double nextBottom = playerBounds.getMaxY() + velocityY;
+    
+        /* Check vertical collision:
+        - Only care if player is falling so if velocityY > 0
+        - PLayer is above platform
+        - But their next bottom will cross or land top of the platform 
+        */
+        boolean vertical = velocityY > 0 &&
+                           playerBounds.getMaxY() <= platformBounds.getMinY() &&
+                           nextBottom >= platformBounds.getMinY();
+    
+        if (horizontal && vertical) {
+            // Collision detected! (player is about to land on platform)
+            // Move player so they stand exactly on top of platform
+            player.setY(platformBounds.getMinY() - player.getHeight());
+            // Stop vertical movement
+            velocityY = 0;
+            jumping = false; // Reset jumping so player can jump again
+            System.out.println("Landed on platform!");
+        } else {
+            // No platofrom collison so apply gravity as normal
+            velocityY += gravity;
+            if (velocityY > maxFallSpeed) {
+                velocityY = maxFallSpeed;
+            }
+    
+            player.setY(nextY);
         }
-
-        // Update player position
-        player.setY(player.getY() + velocityY);
-
-
-        // Floor collision detection for player to not fall through the ground
-        // Works fine
+    
+        // Check (in case of fall-through)
         if (player.getY() >= groundLevel) {
+            // Lock player to ground
             player.setY(groundLevel);
             velocityY = 0;
             jumping = false;
         }
-
-        // Platform collision detection (struggling with this)
-        // TRYING THIS NOT GOING GOOD
-       
-        // Platform collision detection
-        double nextPlayerBottom = player.getY() + player.getHeight() + velocityY;
-        double platformTop = floatingPlatform.getLayoutY(); // Changed to getLayoutY() to get the Y position of the platform
-
-        boolean horizontallyAligned = player.getX() + player.getWidth() > floatingPlatform.getLayoutX() && player.getX() < floatingPlatform.getLayoutX() + floatingPlatform.getWidth();
-        
-        // Fix for vertically aligned check
-        boolean verticallyAligned = nextPlayerBottom > platformTop && player.getY() + player.getHeight() <= platformTop;
-
-        // Check if falling and aligned with the platform
-        if (velocityY > 0 && horizontallyAligned && verticallyAligned) {
-            // Player lands on the platform
-            player.setY(platformTop - player.getHeight()); // Land clean
-            velocityY = 0;
-            jumping = false;
-            System.out.println("Player landed on the platform.");
-        }
-
-        // Debugging: Check player and platform positions
-        System.out.println("Player Y: " + player.getY() + ", Platform Y: " + platformTop);
-        System.out.println("Horizontally aligned: " + horizontallyAligned);
-        System.out.println("Vertically aligned: " + verticallyAligned);
-        System.out.println(floatingPlatform.getBoundsInParent());
-
-
-
-        // WHAT I TRIED BEFORE not working either
-        /*if (velocityY > 0 && player.getBoundsInParent().intersects(floatingPlatform.getBoundsInParent())) {
-            // Player is falling and intersects with the platform
-            double playerBottom = player.getY() + player.getHeight();
-            double platformTop = floatingPlatform.getY();
-
-            // If player bottom is bout to pass platform stop them
-            if (playerBottom <= platformTop + velocityY) {
-                player.setY(platformTop - player.getHeight()); // Set player on top of the platform
-                velocityY = 0; // Stop falling
-                jumping = false; // No longer jumping
-                // For debugging
-                System.out.println("Player landed on the platform.");
-            }
-        }*/   
     }
+    
 
     @FXML 
     public void onKeyPressed(KeyEvent event) {

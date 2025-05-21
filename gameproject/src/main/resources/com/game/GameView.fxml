@@ -10,6 +10,8 @@
             prefWidth="800" prefHeight="600"
             onKeyPressed="#onKeyPressed"
             focusTraversable="true">
+    <!-- Enemy Rectangle -->
+    <Rectangle fx:id="enemy" layoutX="150" layoutY="510" width="40" height="40" fill="red"/>
 
     <!-- Player -->
     <Rectangle fx:id="player" x="100" y="500" width="40" height="40" fill="blue"/>

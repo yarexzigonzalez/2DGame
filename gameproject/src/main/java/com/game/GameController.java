@@ -9,16 +9,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.Rectangle;
 
 public class GameController {
-    private Player playerStats = new Player(); // Create a new player object    
+    private Player playerStats = new Player(); // Create a new player object     
     @FXML
     private Rectangle player; // Matches element type in FXML
     @FXML
     private Button inventoryButton;
     @FXML
     private Label healthLabel;
-
-    private double moveSpeed = 30; // Adjust however you like
-    private int health = 3;
 
     private boolean jumping = false;
     private double velocityY = 0;
@@ -29,7 +26,15 @@ public class GameController {
 
     @FXML 
     private Rectangle floatingPlatform; // Matches element type in FXML
-
+    @FXML
+    private Rectangle enemy;
+    // Using long for time-based cooldown (milliseconds)
+    private long lastDamageTime = 0; // When enemy last damaged player
+    private final long damageCooldown = 1000; // 1 second cooldown between hits
+    
+    private double enemySpeed = 1;
+    private boolean movingRight = true; 
+    
     @FXML
     public void initialize() {
         updateHealthLabel();
@@ -41,11 +46,63 @@ public class GameController {
                applyGravity();
                /*  Every frame, runs applyGravity which check for 
                collisions and update player position */
+
+                moveEnemy(); // Call the enemy movement function
+                checkPlayerEnemyCollision(); // Check for player-enemy collision
+
            }
         };
         timer.start();
     }
 
+    private void moveEnemy() {
+        double playerX = player.getX();
+        double enemyX = enemy.getX();
+        double distance = Math.abs(playerX - enemyX);
+
+        if (distance > enemySpeed) {
+            // Move enemy toward player
+            if (playerX < enemyX) {
+                enemy.setX(enemyX - enemySpeed);
+            } else if (playerX > enemyX) {
+                enemy.setX(enemyX + enemySpeed);
+            } // Let enemy move off screen for now since screen will follow later
+        } else {
+            // Snap enemy nect to playeer so collision works
+            enemy.setX(playerX);
+        }
+    }
+
+
+    private void checkPlayerEnemyCollision() {
+        if (playerStats.isDead) {
+            return; // No collision check if player is dead
+        }
+        // Get bounds for player and enemy
+        Bounds playerBounds = player.getBoundsInParent();
+        Bounds enemyBounds = enemy.getBoundsInParent();
+
+        // Check for collision
+        if (playerBounds.intersects(enemyBounds)) {
+            long currentTime = System.currentTimeMillis();
+            
+            if (currentTime - lastDamageTime >= damageCooldown) {
+                // Collision detected! Player takes damage
+                playerStats.damaged(1); // Assuming enemy deals 1 damage
+                // Will add something to show damage on screen later:
+                // red falsh on player, health bar decrease, sound effect, etc....
+                lastDamageTime = currentTime; // Update last damage time
+                updateHealthLabel(); // Update health label after taking damage
+                
+                if (playerStats.isDead) {
+                    System.out.println("Player is dead!");
+                    // Handle player death later -> restart game, show game over screen
+                }
+                System.out.println("Enemy hit player! Player health is now: " + playerStats.currentHealth);
+            
+            }
+        }
+    }
 
     /* applyGravity() called every frame to add gravity by increasing vertical speed, 
     predicts where player will move next, 
@@ -111,11 +168,11 @@ public class GameController {
         switch (event.getCode()) {
             case LEFT:
             case A:
-                player.setX(player.getX() - moveSpeed);
+                player.setX(player.getX() - playerStats.moveSpeed);
                 break;
             case RIGHT:
             case D:
-                player.setX(player.getX() + moveSpeed);
+                player.setX(player.getX() + playerStats.moveSpeed);
                 break;
             case SPACE:
             case W:

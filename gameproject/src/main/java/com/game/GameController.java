@@ -16,6 +16,8 @@ public class GameController {
     private Button inventoryButton;
     @FXML
     private Label healthLabel;
+    @FXML
+    private Rectangle healthBar;
 
     private boolean jumping = false;
     private double velocityY = 0;
@@ -193,6 +195,9 @@ public class GameController {
 
     private void updateHealthLabel() {
         healthLabel.setText("Health: " + playerStats.currentHealth + "/" + playerStats.maxHealth);
+        // Update health bar width based on current health
+        double healthPercentage = (double) playerStats.currentHealth / playerStats.maxHealth;
+        healthBar.setWidth(healthPercentage * 200); // 200 is the max width of the health bar
     }
 
     

@@ -1,5 +1,5 @@
 package com.game;
-public class Potion implements Item{
+public class Potion extends Item{
     private String name;
     private String type;
     private int quantity;
@@ -8,14 +8,15 @@ public class Potion implements Item{
     private int atk;
     private double moveSpeed;
     private double jumpHeight;
-    private double atkDelay;
+    private long atkDelay;
     private int atkSetting;
 
-    Potion(String name, String type, int quantity, String description) {//, int hp, int atk, double moveSpeed, double jumpHeight){
-        this.name = name;
-        this.type = type;
-        this.quantity = quantity;
-        this.description = description;
+    Potion(String name, String type, int quantity, String description, int hp, int atk, double moveSpeed, double jumpHeight) {//, int hp, int atk, double moveSpeed, double jumpHeight){
+        super(name, type, quantity, description);
+        this.hp = hp;
+        this.atk = atk;
+        this.moveSpeed = moveSpeed;
+        this.jumpHeight = jumpHeight;
         /*this.hp = hp;
         this.atk = atk;
         this.moveSpeed = moveSpeed;
@@ -119,22 +120,26 @@ public class Potion implements Item{
     }
 
     // CHARACTER ATTACKSPEED - use timer to delay each attack
-    public void setAtkDelay(double atkDelay) {
-        this.atkDelay = atkDelay;
+    public void setAtkDelay(long atkDelay) {
+        this.atkDelay = atkDelay*1000;
     }
-    public double getAtkDelay(double atkDelay) {
-        return atkDelay;
+    public void getAtkDelay(long atkDelay) {
+        try {
+            Thread.sleep(atkDelay);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
-    public void addAtkDelay(double atkDelay) {
+    public void addAtkDelay(long atkDelay) {
         this.atkDelay += atkDelay;
     }
-    public void subAtkDelay(double atkDelay) {
+    public void subAtkDelay(long atkDelay) {
         this.atkDelay -= atkDelay;
     }
     public void setAtkSetting(int atkSetting) {
-        double sTime = 1;
-        double mTime = 2;
-        double lTime = 3;
+        long sTime = 1000;
+        long mTime = 2000;
+        long lTime = 3000;
         if (atkSetting >= 0 & atkSetting <= 3) {
             switch (atkSetting) {
                 case 0:

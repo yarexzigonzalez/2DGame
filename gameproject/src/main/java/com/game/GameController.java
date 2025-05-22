@@ -28,9 +28,9 @@ public class GameController {
     private boolean jumping = false;
     private double velocityY = 0;
     private final double gravity = 0.5; // Gravity strength can adjust
-    private final double jumpStrength = -20; // Jump strength can adjust
-    private final double groundLevel = 510; // Y position of the ground can adjust
-    private final double maxFallSpeed = 5; // Maximum falling speed can adjust
+    private final double jumpStrength = -15; // Jump strength can adjust
+    private final double groundLevel = 510; // Y position of the ground can adjust --- Ground level = 510; Water level = 560;
+    private final double maxFallSpeed = 15; // Maximum falling speed can adjust
 
     @FXML 
     private Rectangle floatingPlatform; // Matches element type in FXML
@@ -40,7 +40,7 @@ public class GameController {
     private Rectangle enemy;
     // Using long for time-based cooldown (milliseconds)
     private long lastDamageTime = 0; // When enemy last damaged player
-    private final long damageCooldown = 1000; // 1 second cooldown between hits
+    private final long damageCooldown = 1000; // 1 second cooldown between hits; Invincibility frames
     
     private double enemySpeed = 1;
     private boolean movingRight = true; 
@@ -107,6 +107,8 @@ public class GameController {
                 if (playerStats.isDead) {
                     System.out.println("Player is dead!");
                     // Handle player death later -> restart game, show game over screen
+                    System.out.println("Game Over!");
+                    System.exit(0);
                 }
                 System.out.println("Enemy hit player! Player health is now: " + playerStats.currentHealth);
             
@@ -153,7 +155,7 @@ public class GameController {
         player.setY(orangeBounds.getMinY() - player.getHeight());
         velocityY = 0;
         jumping = false;
-        System.out.println("Landed on orange platform!");
+        //System.out.println("Landed on orange platform!");
         return;
         }
 
@@ -183,7 +185,7 @@ public class GameController {
             // Stop vertical movement
             velocityY = 0;
             jumping = false; // Reset jumping so player can jump again
-            System.out.println("Landed on platform!");
+            //System.out.println("Landed on platform!");
         } else {
             // No platofrom collison so apply gravity as normal
             velocityY += gravity;
@@ -268,9 +270,5 @@ public class GameController {
         // Move world pane left/right to follow player
         // So player moves right and world moves left
         world.setLayoutX(-cameraX);
-
-        
     }
-
-    
 }

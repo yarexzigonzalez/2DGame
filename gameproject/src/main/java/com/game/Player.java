@@ -6,7 +6,7 @@ public class Player extends Character{
     // Player class repeats variables from Character class (redundant)
     // Rewrote a bit to make less redundant
     public int armor;
-    public int attackSpeed;
+    public int attackDelay;
 
     // Just set those in the constructor, not redeclaring them
     public Player(){
@@ -16,7 +16,7 @@ public class Player extends Character{
         this.power = 2;
         this.armor = 0;
         this.isDead = false;
-        this.attackSpeed = 5; //not sure what to do with this yet
+        this.attackDelay = 5; //not sure what to do with this yet
     }
 
     public void damaged(int power){
@@ -36,5 +36,11 @@ public class Player extends Character{
 
     public void powerUpPotion(){
         //trying to figure out a timer to make the powerup only last for a limited time
+
+        // Ashley - Added my own code to test with
+        Potion powerUp = new Potion("Health Max Up", "Health", 1, "Increases Maximum health by 2", 2, 0, 0, 0);
+        powerUp.maxHealth += 2;
+        powerUp.currentHealth += 2;
     }
+
 }

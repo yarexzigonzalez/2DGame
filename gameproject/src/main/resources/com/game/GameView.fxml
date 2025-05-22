@@ -4,25 +4,40 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
+<?import javafx.scene.Group?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.game.GameController"
             prefWidth="800" prefHeight="600"
             onKeyPressed="#onKeyPressed"
             focusTraversable="true">
+    <!-- Camera/View Group -->
+    <Group fx:id="gameView" layoutX="0" layoutY="0">
+        <!-- Background -->
+        <Rectangle width="2000" height="600" fill="lightblue"/>
+        <!-- Game world pane (part that gon move) -->
+        <Pane fx:id="world" prefWidth="2000" prefHeight="600">
 
-    <!-- Player -->
-    <Rectangle fx:id="player" x="100" y="500" width="40" height="40" fill="blue"/>
+            <!-- Test platform scrolling -->
+            <Rectangle fx:id="orangePlatform" layoutX="1800" layoutY="400" width="150" height="20" fill="orange"/>
 
-    <!-- Ground Platform -->
-    <Rectangle layoutX="0" layoutY="550" width="800" height="50" fill="darkgreen"/>
+            <!-- Enemy Rectangle -->
+            <Rectangle fx:id="enemy" layoutX="150" layoutY="510" width="40" height="40" fill="red"/>
 
-    <!-- Floating Platform -->
-    <Rectangle fx:id="floatingPlatform" layoutX="300" layoutY="400" width="150" height="20" fill="darkslateblue"/>
+            <!-- Player -->
+            <Rectangle fx:id="player" x="100" y="500" width="40" height="40" fill="blue"/>
 
+            <!-- Ground Platform -->
+            <Rectangle layoutX="0" layoutY="550" width="800" height="50" fill="darkgreen"/>
 
-    <!-- UI: Health & Inventory -->
-    <Label fx:id="healthLabel" layoutX="20" layoutY="20" text="Health: 3" style="-fx-font-size: 18;"/>
+            <!-- Floating Platform -->
+            <Rectangle fx:id="floatingPlatform" layoutX="300" layoutY="400" width="150" height="20" fill="darkslateblue"/>
+        </Pane>
+    </Group>
+
+    <!-- UI: Health & Inventory (stays fixed on screen)-->
+    <Rectangle fx:id="healthBar" fill="LimeGreen" x="20" y="20" width="200" height="20"/>
+    <Label fx:id="healthLabel" layoutX="30" layoutY="20" text="Health: 3" style="-fx-font-size: 18;"/>
     <Button fx:id="inventoryButton" layoutX="700" layoutY="20" text="Inventory" onAction="#openInventory"/>
 
 </AnchorPane>

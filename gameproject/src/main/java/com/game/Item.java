@@ -1,6 +1,6 @@
 package com.game;
 
-public abstract Item {
+public abstract class Item {
     String item = null;
     int quantity = 0;
     String description = null;

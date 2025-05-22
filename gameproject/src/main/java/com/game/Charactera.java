@@ -23,7 +23,7 @@ public abstract class Charactera{
     private int level;
     private int exp;
 
-    public Character(int hp, int atk, double moveSpeed, double jumpHeight, double weaponRange, double atkDelay) {
+    public Charactera(int hp, int atk, double moveSpeed, double jumpHeight, double weaponRange, double atkDelay) {
         this.hp = hp;
         this.atk = atk;
         this.moveSpeed = moveSpeed;

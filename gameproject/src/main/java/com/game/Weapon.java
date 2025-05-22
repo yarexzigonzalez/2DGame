@@ -1,5 +1,5 @@
 package com.game;
-public class Weapon implements Item {
+public class Weapon extends Item {
     private String name;
     private String type;
     private int atk;

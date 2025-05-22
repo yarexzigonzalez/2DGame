@@ -1,5 +1,5 @@
 package com.game;
-public class Potion implements Item{
+public class Potion extends Item{
     private String name;
     private String type;
     private int quantity;

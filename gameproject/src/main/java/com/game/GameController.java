@@ -28,9 +28,13 @@ public class GameController {
     private boolean jumping = false;
     private double velocityY = 0;
     private final double gravity = 0.5; // Gravity strength can adjust
-    private final double jumpStrength = -20; // Jump strength can adjust
+    private final double jumpStrength = -15; // (suggested by ashley)
     private final double groundLevel = 510; // Y position of the ground can adjust
-    private final double maxFallSpeed = 5; // Maximum falling speed can adjust
+    // (Ashley's suggestion:
+    // Ground level = 510
+    // Water level = 560
+    private final double maxFallSpeed = 15; // Maximum falling speed can adjust
+    // (Ashley's suggestion)
 
     @FXML 
     private Rectangle floatingPlatform; // Matches element type in FXML

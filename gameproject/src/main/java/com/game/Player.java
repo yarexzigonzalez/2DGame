@@ -6,7 +6,7 @@ public class Player extends Character{
     // Player class repeats variables from Character class (redundant)
     // Rewrote a bit to make less redundant
     public int armor;
-    public int attackSpeed;
+    public int attackDelay;
 
     // Just set those in the constructor, not redeclaring them
     public Player(){
@@ -16,7 +16,7 @@ public class Player extends Character{
         this.power = 2;
         this.armor = 0;
         this.isDead = false;
-        this.attackSpeed = 5; //not sure what to do with this yet
+        this.attackDelay = 5; //not sure what to do with this yet
     }
 
     public void damaged(int power){

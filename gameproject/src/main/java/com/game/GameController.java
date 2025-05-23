@@ -9,6 +9,8 @@ import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameController {
     private Player playerStats = new Player(); // Create a new player object     
@@ -41,33 +43,42 @@ public class GameController {
     @FXML
     private Rectangle orangePlatform; 
     @FXML
+    private Rectangle greenPlatform;
+    @FXML
     private Rectangle enemy;
     // Using long for time-based cooldown (milliseconds)
     private long lastDamageTime = 0; // When enemy last damaged player
     private final long damageCooldown = 1000; // 1 second cooldown between hits
     
     private double enemySpeed = 1;
-    private boolean movingRight = true; 
+    //private boolean movingRight = true; forgot why i had this here, but it doesn't seem to be used
+
+    private final List<Rectangle> platforms = new ArrayList<>(); // List to hold all platforms
     
+// ------------------------------------------------------------------------------------
+
     @FXML
     public void initialize() {
         updateHealthLabel();
+        platforms.add(floatingPlatform);
+        platforms.add(orangePlatform);
+        platforms.add(greenPlatform);
 
         // Loop animation (allows for smooth movement)
         AnimationTimer timer = new AnimationTimer() {
            @Override
            public void handle(long now) {
-               applyGravity();
+                applyGravity();
                /*  Every frame, runs applyGravity which check for 
                collisions and update player position */
-
                 moveEnemy(); // Call the enemy movement function
                 checkPlayerEnemyCollision(); // Check for player-enemy collision
-
            }
         };
         timer.start();
     }
+
+// ------------------------------------------------------------------------------------
 
     private void moveEnemy() {
         double playerX = player.getX();
@@ -87,6 +98,7 @@ public class GameController {
         }
     }
 
+// ------------------------------------------------------------------------------------
 
     private void checkPlayerEnemyCollision() {
         if (playerStats.isDead) {
@@ -118,6 +130,8 @@ public class GameController {
         }
     }
 
+// ------------------------------------------------------------------------------------
+
     /* applyGravity() called every frame to add gravity by increasing vertical speed, 
     predicts where player will move next, 
     detects if player will land on platfrom, 
@@ -127,86 +141,45 @@ public class GameController {
     private void applyGravity() {
         // Calculate where player will move next vertically (Y position)
         double nextY = player.getY() + velocityY;
-    
         // Get bounds for next frame
         Bounds playerBounds = player.getBoundsInParent();
-        Bounds platformBounds = floatingPlatform.getBoundsInParent();
-        
-        Bounds orangeBounds = orangePlatform.getBoundsInParent();
 
-        // Proably shouldn't have to write the same code every time for 
-        // different platforms, but for now this works
-        // Later can make a function to check for all platforms or some loop and arrayList?
-
-        // ----------------------------------------------------------------
-        // Orange platform collision check
-
-        // Check if player is horizontally within orange platform
-        boolean orangeHorizontal = playerBounds.getMaxX() > orangeBounds.getMinX() &&
-        playerBounds.getMinX() < orangeBounds.getMaxX();
-
-        // Predict next bottom Y position
-        double orangeNextBottom = playerBounds.getMaxY() + velocityY;
-
-        // Check vertical collision for orange platform
-        boolean orangeVertical = velocityY > 0 &&
-        playerBounds.getMaxY() <= orangeBounds.getMinY() &&
-        orangeNextBottom >= orangeBounds.getMinY();
-
-        if (orangeHorizontal && orangeVertical) {
-        player.setY(orangeBounds.getMinY() - player.getHeight());
-        velocityY = 0;
-        jumping = false;
-        System.out.println("Landed on orange platform!");
-        return;
-        }
-
-        // ---------------------------------------------------------------
-        // Purple platform collision check
-
-        // Check if player is horizontally within platform's width
-        boolean horizontal = playerBounds.getMaxX() > platformBounds.getMinX() &&
-                             playerBounds.getMinX() < platformBounds.getMaxX();
-    
-        // Predict next bottom Y position
-        double nextBottom = playerBounds.getMaxY() + velocityY;
-    
-        /* Check vertical collision:
-        - Only care if player is falling so if velocityY > 0
-        - PLayer is above platform
-        - But their next bottom will cross or land top of the platform 
-        */
-        boolean vertical = velocityY > 0 &&
-                           playerBounds.getMaxY() <= platformBounds.getMinY() &&
-                           nextBottom >= platformBounds.getMinY();
-    
-        if (horizontal && vertical) {
-            // Collision detected! (player is about to land on platform)
-            // Move player so they stand exactly on top of platform
-            player.setY(platformBounds.getMinY() - player.getHeight());
-            // Stop vertical movement
-            velocityY = 0;
-            jumping = false; // Reset jumping so player can jump again
-            System.out.println("Landed on platform!");
-        } else {
-            // No platofrom collison so apply gravity as normal
+        // Loop through all platforms to check for collision
+        for (Rectangle platform : platforms) {
+            Bounds platformBounds = platform.getBoundsInParent();
+            boolean horizontal = playerBounds.getMaxX() > platformBounds.getMinX() &&
+                                 playerBounds.getMinX() < platformBounds.getMaxX();
+            // Predict next bottom Y position
+            double nextBottom = playerBounds.getMaxY() + velocityY;
+            // Check vertical collision
+            boolean vertical = velocityY > 0 &&
+                               playerBounds.getMaxY() <= platformBounds.getMinY() &&
+                               nextBottom >= platformBounds.getMinY();
+            if (horizontal && vertical) {
+                // Collision detected! Move player to stand on platform
+                player.setY(platformBounds.getMinY() - player.getHeight());
+                velocityY = 0; // Stop vertical movement
+                jumping = false; // Reset jumping so player can jump again
+                return; // Exit the loop after collision
+            }
+        }   
+            // No platform collision, apply gravity as normal
             velocityY += gravity;
             if (velocityY > maxFallSpeed) {
-                velocityY = maxFallSpeed;
+                velocityY = maxFallSpeed; // Cap fall speed
             }
-    
-            player.setY(nextY);
-        }
-    
-        // Check (in case of fall-through)
-        if (player.getY() >= groundLevel) {
-            // Lock player to ground
-            player.setY(groundLevel);
-            velocityY = 0;
-            jumping = false;
-        }
+            player.setY(nextY); // Update player Y position
+
+            // Ground check
+            if (player.getY() >= groundLevel) {
+                // Lock player to ground
+                player.setY(groundLevel);
+                velocityY = 0; // Stop vertical movement
+                jumping = false; // Reset jumping so player can jump again
+            }
     }
     
+// ---------------------------------------------------------------------------
 
     @FXML 
     public void onKeyPressed(KeyEvent event) {
@@ -233,6 +206,8 @@ public class GameController {
         }
     }
 
+// --------------------------------------------------------------------------------
+   
     @FXML
     private void openInventory() {
         // Logic to open the inventory
@@ -245,6 +220,8 @@ public class GameController {
         double healthPercentage = (double) playerStats.currentHealth / playerStats.maxHealth;
         healthBar.setWidth(healthPercentage * 200); // 200 is the max width of the health bar
     }
+
+// --------------------------------------------------------------------------------
 
     /*
      - 'world' is pane that holds all game elements and stuff like player, platforms, etc.
@@ -272,9 +249,11 @@ public class GameController {
         // Move world pane left/right to follow player
         // So player moves right and world moves left
         world.setLayoutX(-cameraX);
-
-        
     }
+
+// --------------------------------------------------------------------------------
+    
+    
 
     
 }

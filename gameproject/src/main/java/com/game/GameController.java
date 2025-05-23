@@ -46,11 +46,9 @@ public class GameController {
     private Rectangle greenPlatform;
     @FXML
     private Rectangle enemy;
-    // Using long for time-based cooldown (milliseconds)
-    private long lastDamageTime = 0; // When enemy last damaged player
-    private final long damageCooldown = 1000; // 1 second cooldown between hits
-    
-    private double enemySpeed = 1;
+
+    private Enemy enemyStats = new Enemy(); // Create a new enemy object
+
     //private boolean movingRight = true; forgot why i had this here, but it doesn't seem to be used
 
     private final List<Rectangle> platforms = new ArrayList<>(); // List to hold all platforms
@@ -84,13 +82,14 @@ public class GameController {
         double playerX = player.getX();
         double enemyX = enemy.getX();
         double distance = Math.abs(playerX - enemyX);
+        double speed = enemyStats.moveSpeed; // Enemy speed
 
-        if (distance > enemySpeed) {
+        if (distance > speed) {
             // Move enemy toward player
             if (playerX < enemyX) {
-                enemy.setX(enemyX - enemySpeed);
+                enemy.setX(enemyX - speed);
             } else if (playerX > enemyX) {
-                enemy.setX(enemyX + enemySpeed);
+                enemy.setX(enemyX + speed);
             } // Let enemy move off screen for now since screen will follow later
         } else {
             // Snap enemy nect to playeer so collision works
@@ -101,23 +100,20 @@ public class GameController {
 // ------------------------------------------------------------------------------------
 
     private void checkPlayerEnemyCollision() {
-        if (playerStats.isDead) {
-            return; // No collision check if player is dead
+        if (playerStats.isDead || enemyStats.isDead) {
+            return; // No collision check if player or enemy is dead
         }
         // Get bounds for player and enemy
         Bounds playerBounds = player.getBoundsInParent();
         Bounds enemyBounds = enemy.getBoundsInParent();
-
         // Check for collision
         if (playerBounds.intersects(enemyBounds)) {
-            long currentTime = System.currentTimeMillis();
-            
-            if (currentTime - lastDamageTime >= damageCooldown) {
+            if (enemyStats.canAttack()) {
                 // Collision detected! Player takes damage
-                playerStats.damaged(1); // Assuming enemy deals 1 damage
+                playerStats.damaged(enemyStats.power); // Assuming enemy deals 1 damage
                 // Will add something to show damage on screen later:
-                // red falsh on player, health bar decrease, sound effect, etc....
-                lastDamageTime = currentTime; // Update last damage time
+                // red flash on player, health bar decrease, sound effect, etc....
+                enemyStats.attackedPlayer(); // Update last damage time
                 updateHealthLabel(); // Update health label after taking damage
                 
                 if (playerStats.isDead) {
@@ -125,7 +121,6 @@ public class GameController {
                     // Handle player death later -> restart game, show game over screen
                 }
                 System.out.println("Enemy hit player! Player health is now: " + playerStats.currentHealth);
-            
             }
         }
     }
@@ -194,6 +189,9 @@ public class GameController {
             case D:
                 player.setX(player.getX() + playerStats.moveSpeed);
                 updateCamera(); // Update camera position
+                break;
+            case F:
+                //swingSword();
                 break;
             case SPACE:
             case W:

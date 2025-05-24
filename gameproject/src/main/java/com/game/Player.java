@@ -26,11 +26,11 @@ public class Player extends Character{
         }
     }
 
-    public void healthPotion(){
-        if ((this.currentHealth + 2) >= this.maxHealth){
+    public void healthPotion(int healAmount){
+        if ((this.currentHealth + healAmount) >= this.maxHealth){
             this.currentHealth = this.maxHealth;
         } else {
-            this.currentHealth += 2;
+            this.currentHealth += healAmount;
         }
     }
 

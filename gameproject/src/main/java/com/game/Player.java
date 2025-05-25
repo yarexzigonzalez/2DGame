@@ -37,4 +37,15 @@ public class Player extends Character{
     public void powerUpPotion(){
         //trying to figure out a timer to make the powerup only last for a limited time
     }
+
+    private boolean facingRight = true; // Default facing direction
+    
+    public boolean isFacingRight() {
+        return facingRight;
+    }
+    
+    public void setFacingRight(boolean facingRight) {
+        this.facingRight = facingRight;
+    }
+    
 }

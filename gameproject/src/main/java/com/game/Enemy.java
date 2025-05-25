@@ -6,7 +6,7 @@ public class Enemy extends Character {
     private double speed;
 
     public Enemy() {
-        this.maxHealth = 5;
+        this.maxHealth = 10;
         this.currentHealth = maxHealth;
         this.power = 1;
         this.moveSpeed = 1;
@@ -23,6 +23,7 @@ public class Enemy extends Character {
         currentHealth -= damage;
         if (currentHealth <= 0) {
             isDead = true;
+            currentHealth = 0; // Ensure health doesn't go negative
         }
     }
 }

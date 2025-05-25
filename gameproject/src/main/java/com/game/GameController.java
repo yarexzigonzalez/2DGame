@@ -23,6 +23,8 @@ public class GameController {
     @FXML
     private Rectangle healthBar;
     @FXML
+    private Rectangle enemyHealthBar; 
+    @FXML
     private Pane world;
     @FXML
     private Group gameView;
@@ -48,6 +50,8 @@ public class GameController {
     private Rectangle enemy;
 
     private Enemy enemyStats = new Enemy(); // Create a new enemy object
+    @FXML 
+    private Label enemyHealthLabel;
 
     //private boolean movingRight = true; forgot why i had this here, but it doesn't seem to be used
 
@@ -58,6 +62,8 @@ public class GameController {
     @FXML
     public void initialize() {
         updateHealthLabel();
+        updateEnemyHealthLabel(); // Update enemy health label
+        
         platforms.add(floatingPlatform);
         platforms.add(orangePlatform);
         platforms.add(greenPlatform);
@@ -67,10 +73,20 @@ public class GameController {
            @Override
            public void handle(long now) {
                 applyGravity();
-               /*  Every frame, runs applyGravity which check for 
-               collisions and update player position */
+                /*  Every frame, runs applyGravity which check for 
+                collisions and update player position */
                 moveEnemy(); // Call the enemy movement function
                 checkPlayerEnemyCollision(); // Check for player-enemy collision
+                
+                // Show player health bar and label
+                enemyHealthBar.setLayoutX(enemy.getLayoutX());
+                enemyHealthBar.setLayoutY(enemy.getLayoutY() - 15);
+                // Doesn't work with .setLayoutX/Y, for some reason
+                // Used .setTranslateX/Y randomly and it worked, so I guess it works
+                enemyHealthLabel.setTranslateX(enemy.getLayoutX());
+                enemyHealthLabel.setTranslateY(enemy.getLayoutY() - 30);
+                
+
            }
         };
         timer.start();
@@ -95,12 +111,25 @@ public class GameController {
             // Snap enemy nect to playeer so collision works
             enemy.setX(playerX);
         }
+
+        // Update enemy health bar and label position so it follows enemy!
+        double healthBarOffsetY = 15; 
+        double labelOffsetY = 30; 
+
+        // .set for shapes, .setLayout for labels/imageview/pane (note to self)
+        enemyHealthBar.setX(enemy.getX());
+        enemyHealthBar.setY(enemy.getY() - healthBarOffsetY);
+
+        enemyHealthLabel.setLayoutX(enemy.getX());
+        enemyHealthLabel.setLayoutY(enemy.getY() - labelOffsetY);
     }
 
 // ------------------------------------------------------------------------------------
 
     private void checkPlayerEnemyCollision() {
         if (playerStats.isDead || enemyStats.isDead) {
+            enemy.setVisible(false); // Hide enemy if dead
+            enemyHealthLabel.setVisible(false); // Hide enemy health label if dead
             return; // No collision check if player or enemy is dead
         }
         // Get bounds for player and enemy
@@ -184,14 +213,16 @@ public class GameController {
             case A:
                 player.setX(player.getX() - playerStats.moveSpeed);
                 updateCamera(); // Update camera position
+                playerStats.setFacingRight(false); 
                 break;
             case RIGHT:
             case D:
                 player.setX(player.getX() + playerStats.moveSpeed);
                 updateCamera(); // Update camera position
+                playerStats.setFacingRight(true); 
                 break;
             case F:
-                //swingSword();
+                swingSword();
                 break;
             case SPACE:
             case W:
@@ -217,6 +248,12 @@ public class GameController {
         // Update health bar width based on current health
         double healthPercentage = (double) playerStats.currentHealth / playerStats.maxHealth;
         healthBar.setWidth(healthPercentage * 200); // 200 is the max width of the health bar
+    }
+
+    private void updateEnemyHealthLabel() {
+        enemyHealthLabel.setText("Enemy HP: " + enemyStats.currentHealth + "/" + enemyStats.maxHealth);
+        double healthPercentage = (double) enemyStats.currentHealth / enemyStats.maxHealth;
+        enemyHealthBar.setWidth(healthPercentage * 50);
     }
 
 // --------------------------------------------------------------------------------
@@ -251,7 +288,37 @@ public class GameController {
 
 // --------------------------------------------------------------------------------
     
-    
+    private void swingSword() {
+        if (enemyStats.isDead) {
+            return; // No attack if enemy is dead
+        }
+        // Get actuall positions of player and enemy
+        double playerX = player.getBoundsInParent().getMinX();
+        double playerY = player.getBoundsInParent().getMinY();
+        double enemyX = enemy.getBoundsInParent().getMinX();
+        double enemyY = enemy.getBoundsInParent().getMinY();
+
+        double range = 110; // Attack range
+        boolean enemyInRange = false;
+        // Check if enemy is within attack range based on player's facing direction
+        if (playerStats.isFacingRight()) {
+            enemyInRange = enemyX > playerX &&
+                           enemyX <= playerX + range;
+        } else {
+            enemyInRange = enemyX < playerX &&
+                           enemyX >= playerX - range;
+        }
+
+        // Check if enemy is within vertical range (Y position)
+        if (enemyInRange && Math.abs(playerY - enemyY) < 50) {
+            enemyStats.takeDamage(1);
+            updateEnemyHealthLabel(); 
+            System.out.println("Enemy hit! Enemy health is now: " + enemyStats.currentHealth);
+
+        } else {
+            System.out.println("Missed! Enemy out of range.");
+        }
+    }
 
     
 }

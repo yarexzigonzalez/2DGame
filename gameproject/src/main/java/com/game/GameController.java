@@ -11,6 +11,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class GameController {
     private Player playerStats = new Player(); // Create a new player object     
@@ -28,6 +30,9 @@ public class GameController {
     private Pane world;
     @FXML
     private Group gameView;
+
+    private HealthPotion potion; // Instance of HealthPotion
+    private ImageView potionImage; // ImageView for potion
 
     private boolean jumping = false;
     private double velocityY = 0;
@@ -68,6 +73,19 @@ public class GameController {
         platforms.add(orangePlatform);
         platforms.add(greenPlatform);
 
+        // Create potion instance
+        potion = new HealthPotion("Health Potion", getClass().getResource("/com/game/healthPotion.PNG").toExternalForm(), 10);
+
+        // Create ImageView for potion
+        potionImage = new ImageView(new Image(potion.getImagePath()));
+        potionImage.setFitWidth(32);
+        potionImage.setFitHeight(32);
+        potionImage.setLayoutX(400); // Position in world coordinates
+        potionImage.setLayoutY(510);
+
+        // Add potion to world pane
+        world.getChildren().add(potionImage);
+
         // Loop animation (allows for smooth movement)
         AnimationTimer timer = new AnimationTimer() {
            @Override
@@ -77,7 +95,8 @@ public class GameController {
                 collisions and update player position */
                 moveEnemy(); // Call the enemy movement function
                 checkPlayerEnemyCollision(); // Check for player-enemy collision
-                
+                checkPotionCollision(); 
+
                 // Show player health bar and label
                 enemyHealthBar.setLayoutX(enemy.getLayoutX());
                 enemyHealthBar.setLayoutY(enemy.getLayoutY() - 15);
@@ -319,6 +338,13 @@ public class GameController {
             System.out.println("Missed! Enemy out of range.");
         }
     }
+// --------------------------------------------------------------------------------
 
-    
+    private void checkPotionCollision() {
+        if (potionImage != null && player.getBoundsInParent().intersects(potionImage.getBoundsInParent())) {
+            world.getChildren().remove(potionImage);
+            potionImage = null;
+            potion.use();
+        }
+    }
 }

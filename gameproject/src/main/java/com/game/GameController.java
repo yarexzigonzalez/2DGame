@@ -10,6 +10,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -38,13 +39,10 @@ public class GameController {
     private double velocityY = 0;
     private final double gravity = 0.5; // Gravity strength can adjust
     private final double jumpStrength = -15; // (suggested by ashley)
-    private final double groundLevel = 940; // Y position on top of ground platform
-    // (Ashley's suggestion:
-    // Ground level = 510
-    // Water level = 560
     private final double maxFallSpeed = 15; // Maximum falling speed can adjust
     // (Ashley's suggestion)
-
+    @FXML
+    private Rectangle groundPlatform;
     @FXML 
     private Rectangle floatingPlatform; // Matches element type in FXML
     @FXML
@@ -52,16 +50,17 @@ public class GameController {
     @FXML
     private Rectangle greenPlatform;
     @FXML
+    private Rectangle water;
+    @FXML
     private Rectangle enemy;
 
     private Enemy enemyStats = new Enemy(); // Create a new enemy object
     @FXML 
     private Label enemyHealthLabel;
-
-    //private boolean movingRight = true; forgot why i had this here, but it doesn't seem to be used
-
-    private final List<Rectangle> platforms = new ArrayList<>(); // List to hold all platforms
     
+    //private final List<Rectangle> platforms = new ArrayList<>(); // List to hold all platforms
+    
+    private List<Rectangle> platforms; // List to hold all platforms
 // ------------------------------------------------------------------------------------
 
     @FXML
@@ -69,20 +68,21 @@ public class GameController {
         updateHealthLabel();
         updateEnemyHealthLabel(); // Update enemy health label
         
-        platforms.add(floatingPlatform);
+        /*platforms.add(floatingPlatform);
         platforms.add(orangePlatform);
-        platforms.add(greenPlatform);
+        platforms.add(greenPlatform);*/
+
+        // More efficient way to initialize platforms?
+        platforms = Arrays.asList(groundPlatform, floatingPlatform, orangePlatform, greenPlatform);
 
         // Create potion instance
         potion = new HealthPotion("Health Potion", getClass().getResource("/com/game/healthPotion.PNG").toExternalForm(), 10);
 
         // Create ImageView for potion
         potionImage = new ImageView(new Image(potion.getImagePath()));
-        /*potionImage.setFitWidth(32);
+        potionImage.setFitWidth(32);
         potionImage.setFitHeight(32);
-        potionImage.setLayoutX(400); // Position in world coordinates
-        potionImage.setLayoutY(510);*/
-        
+
         // Position potion on green platform
         double potionX = greenPlatform.getLayoutX() + 50; 
         double potionY = greenPlatform.getLayoutY() - 55; // Put it on top of platform (32 is potion height)
@@ -102,6 +102,7 @@ public class GameController {
                 moveEnemy(); // Call the enemy movement function
                 checkPlayerEnemyCollision(); // Check for player-enemy collision
                 checkPotionCollision(); 
+                checkWaterCollision();
 
                 // Show player health bar and label
                 enemyHealthBar.setLayoutX(enemy.getLayoutX());
@@ -218,14 +219,6 @@ public class GameController {
                 velocityY = maxFallSpeed; // Cap fall speed
             }
             player.setY(nextY); // Update player Y position
-
-            // Ground check
-            if (player.getY() >= groundLevel) {
-                // Lock player to ground
-                player.setY(groundLevel);
-                velocityY = 0; // Stop vertical movement
-                jumping = false; // Reset jumping so player can jump again
-            }
     }
     
 // ---------------------------------------------------------------------------
@@ -277,6 +270,7 @@ public class GameController {
     }
 
     private void updateEnemyHealthLabel() {
+        enemyHealthLabel.setVisible(true); 
         enemyHealthLabel.setText("Enemy HP: " + enemyStats.currentHealth + "/" + enemyStats.maxHealth);
         double healthPercentage = (double) enemyStats.currentHealth / enemyStats.maxHealth;
         enemyHealthBar.setWidth(healthPercentage * 50);
@@ -348,10 +342,69 @@ public class GameController {
 // --------------------------------------------------------------------------------
 
     private void checkPotionCollision() {
-        if (potionImage != null && player.getBoundsInParent().intersects(potionImage.getBoundsInParent())) {
-            world.getChildren().remove(potionImage);
-            potionImage = null;
+        if (potionImage != null && potionImage.isVisible() && player.getBoundsInParent().intersects(potionImage.getBoundsInParent())) {
+            //world.getChildren().remove(potionImage);
+            potionImage.setVisible(false);
             potion.use();
         }
     }
+// --------------------------------------------------------------------------------
+
+    private void checkWaterCollision() {
+        if (player.getBoundsInParent().intersects(water.getBoundsInParent())) {
+            if (!playerStats.isDead) {
+                playerStats.isDead = true;
+                System.out.println("Player drowned in water! Game over!");
+                restartGame();
+            }
+            
+        }
+    }
+// --------------------------------------------------------------------------------
+
+    private void restartGame() {
+        System.out.println("Restarting game...");
+
+        // Player x and y positions
+        double startingX = 100; // Starting X position of player
+        double startingY = 850; // Starting Y position of player
+        // Enemy x and y positions
+        double enemyStartingX = 200; // Starting X position of enemy
+        double enemyStartingY = 937; // Starting Y position of enemy
+
+        // Reset player
+        player.setX(startingX);
+        player.setY(startingY);
+        playerStats.isDead = false;
+        velocityY = 0; 
+
+        // Reset enemy
+        enemy.setVisible(true); 
+        enemy.setLayoutX(enemyStartingX);
+        enemy.setLayoutY(enemyStartingY);
+        enemyStats.isDead = false;
+        enemyStats.currentHealth = enemyStats.maxHealth; // Reset enemy health
+
+        // Reset potion
+        if (potionImage != null) {
+            potionImage.setVisible(true);
+            double potionX = greenPlatform.getLayoutX() + 50; 
+            double potionY = greenPlatform.getLayoutY() - 55;
+            potionImage.setLayoutX(potionX);
+            potionImage.setLayoutY(potionY);
+        }
+
+        // Reset health labels
+        updateHealthLabel();
+        updateEnemyHealthLabel();
+
+        // Reset camera position
+        world.setLayoutX(0); // Reset camera to start position
+
+        // Reset tiner 
+        // Maybe add timer to game to track time played or something (later)
+        //startTime = System.nanoTime();
+        //gameTimer.start();
+    }
+
 }

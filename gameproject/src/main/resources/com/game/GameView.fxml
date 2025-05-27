@@ -17,7 +17,9 @@
         <Rectangle width="2000" height="1080" fill="lightblue"/>
         <!-- Game world pane (part that gon move) -->
         <Pane fx:id="world" prefWidth="2000" prefHeight="1080">
-
+            <!-- Water -->
+            <Rectangle fx:id="water" layoutX="1980" layoutY="1000" width="2000" height="80" fill="blue"/>
+            <!-- UI: Enemy Health Bar -->
             <Label fx:id="enemyHealthLabel" layoutX="900" layoutY="30" text="Enemy HP: 10/10"/>
             <Rectangle fx:id="enemyHealthBar" fill="DarkRed" width="50" height="12"/>
             
@@ -32,7 +34,7 @@
             <Rectangle fx:id="player" x="100" y="850" width="40" height="40" fill="blue"/>
 
             <!-- Ground Platform -->
-            <Rectangle layoutX="-109" layoutY="980" width="2000" height="100" fill="darkgreen"/>
+            <Rectangle fx:id="groundPlatform" layoutX="-109" layoutY="980" width="2000" height="100" fill="darkgreen"/>
 
             <!-- Floating Platform -->
             <Rectangle fx:id="floatingPlatform" layoutX="300" layoutY="850" width="150" height="20" fill="darkslateblue"/>

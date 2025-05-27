@@ -38,7 +38,7 @@ public class GameController {
     private double velocityY = 0;
     private final double gravity = 0.5; // Gravity strength can adjust
     private final double jumpStrength = -15; // (suggested by ashley)
-    private final double groundLevel = 510; // Y position of the ground can adjust
+    private final double groundLevel = 940; // Y position on top of ground platform
     // (Ashley's suggestion:
     // Ground level = 510
     // Water level = 560
@@ -78,10 +78,16 @@ public class GameController {
 
         // Create ImageView for potion
         potionImage = new ImageView(new Image(potion.getImagePath()));
-        potionImage.setFitWidth(32);
+        /*potionImage.setFitWidth(32);
         potionImage.setFitHeight(32);
         potionImage.setLayoutX(400); // Position in world coordinates
-        potionImage.setLayoutY(510);
+        potionImage.setLayoutY(510);*/
+        
+        // Position potion on green platform
+        double potionX = greenPlatform.getLayoutX() + 50; 
+        double potionY = greenPlatform.getLayoutY() - 55; // Put it on top of platform (32 is potion height)
+        potionImage.setLayoutX(potionX);
+        potionImage.setLayoutY(potionY);
 
         // Add potion to world pane
         world.getChildren().add(potionImage);
@@ -256,11 +262,12 @@ public class GameController {
 
 // --------------------------------------------------------------------------------
    
+    /* Leave out for now
     @FXML
     private void openInventory() {
         // Logic to open the inventory
         System.out.println("Inventory opened, add GUI here."); 
-    }
+    }*/
 
     private void updateHealthLabel() {
         healthLabel.setText("Health: " + playerStats.currentHealth + "/" + playerStats.maxHealth);

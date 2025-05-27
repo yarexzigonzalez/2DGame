@@ -8,40 +8,40 @@
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.game.GameController"
-            prefWidth="800" prefHeight="600"
+            prefWidth="1920" prefHeight="1080"
             onKeyPressed="#onKeyPressed"
             focusTraversable="true">
     <!-- Camera/View Group -->
     <Group fx:id="gameView" layoutX="0" layoutY="0">
         <!-- Background -->
-        <Rectangle width="2000" height="600" fill="lightblue"/>
+        <Rectangle width="2000" height="1080" fill="lightblue"/>
         <!-- Game world pane (part that gon move) -->
-        <Pane fx:id="world" prefWidth="2000" prefHeight="600">
+        <Pane fx:id="world" prefWidth="2000" prefHeight="1080">
 
             <Label fx:id="enemyHealthLabel" layoutX="900" layoutY="30" text="Enemy HP: 10/10"/>
             <Rectangle fx:id="enemyHealthBar" fill="DarkRed" width="50" height="12"/>
             
             <!-- Test platform scrolling -->
-            <Rectangle fx:id="orangePlatform" layoutX="1800" layoutY="400" width="150" height="20" fill="orange"/>
-            <Rectangle fx:id="greenPlatform" layoutX="460" layoutY="350" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="orangePlatform" layoutX="1800" layoutY="870" width="150" height="20" fill="orange"/>
+            <Rectangle fx:id="greenPlatform" layoutX="460" layoutY="750" width="150" height="20" fill="green"/>
 
             <!-- Enemy Rectangle -->
-            <Rectangle fx:id="enemy" layoutX="150" layoutY="510" width="40" height="40" fill="red"/>
+            <Rectangle fx:id="enemy" layoutX="150" layoutY="940" width="40" height="40" fill="red"/>
 
             <!-- Player -->
-            <Rectangle fx:id="player" x="100" y="500" width="40" height="40" fill="blue"/>
+            <Rectangle fx:id="player" x="100" y="850" width="40" height="40" fill="blue"/>
 
             <!-- Ground Platform -->
-            <Rectangle layoutX="0" layoutY="550" width="800" height="50" fill="darkgreen"/>
+            <Rectangle layoutX="-109" layoutY="980" width="2000" height="100" fill="darkgreen"/>
 
             <!-- Floating Platform -->
-            <Rectangle fx:id="floatingPlatform" layoutX="300" layoutY="400" width="150" height="20" fill="darkslateblue"/>
+            <Rectangle fx:id="floatingPlatform" layoutX="300" layoutY="850" width="150" height="20" fill="darkslateblue"/>
         </Pane>
     </Group>
 
     <!-- UI: Health & Inventory (stays fixed on screen)-->
     <Rectangle fx:id="healthBar" fill="LimeGreen" x="20" y="20" width="200" height="20"/>
     <Label fx:id="healthLabel" layoutX="30" layoutY="20" text="Health: 3" style="-fx-font-size: 18;"/>
-    <Button fx:id="inventoryButton" layoutX="700" layoutY="20" text="Inventory" onAction="#openInventory"/>
+    <!-- <Button fx:id="inventoryButton" layoutX="700" layoutY="20" text="Inventory" onAction="#openInventory"/> -->
 
 </AnchorPane>

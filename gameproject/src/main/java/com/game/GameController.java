@@ -73,8 +73,10 @@ public class GameController {
         platforms.add(greenPlatform);*/
 
         // More efficient way to initialize platforms?
-        platforms = Arrays.asList(groundPlatform, floatingPlatform, orangePlatform, greenPlatform);
-
+        platforms = Arrays.asList(
+            groundPlatform, floatingPlatform, orangePlatform, greenPlatform
+            // add more
+        );
         // Create potion instance
         potion = new HealthPotion("Health Potion", getClass().getResource("/com/game/healthPotion.PNG").toExternalForm(), 10);
 
@@ -377,6 +379,7 @@ public class GameController {
         player.setY(startingY);
         playerStats.isDead = false;
         velocityY = 0; 
+        playerStats.currentHealth = playerStats.maxHealth; 
 
         // Reset enemy
         enemy.setVisible(true); 

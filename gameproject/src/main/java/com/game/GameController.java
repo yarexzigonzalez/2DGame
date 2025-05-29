@@ -348,6 +348,7 @@ public class GameController {
         if (potionImage != null && potionImage.isVisible() && player.getBoundsInParent().intersects(potionImage.getBoundsInParent())) {
             //world.getChildren().remove(potionImage);
             potionImage.setVisible(false);
+            playerStats.healthPotion(potion.getHealAmount());
             potion.use();
         }
     }

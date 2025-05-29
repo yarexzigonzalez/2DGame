@@ -45,6 +45,13 @@
     <!-- UI: Health & Inventory (stays fixed on screen)-->
     <Rectangle fx:id="healthBar" fill="LimeGreen" x="20" y="20" width="200" height="20"/>
     <Label fx:id="healthLabel" layoutX="30" layoutY="20" text="Health: 3" style="-fx-font-size: 18;"/>
+    <Label fx:id="healLabel" layoutX="700" layoutY="20" text="" 
+       style="-fx-font-size: 18; -fx-background-color: rgba(57, 219, 57, 0.9); -fx-text-fill: white; -fx-padding: 5px;"/>
+    <Label fx:id="speedLabel" layoutX="900" layoutY="20" text="" 
+        style="-fx-font-size: 18; -fx-background-color: rgba(0, 188, 226, 0.6); -fx-text-fill: white; -fx-padding: 5px;"/>
+    <Label fx:id="damageLabel" layoutX="1100" layoutY="20" text="" 
+        style="-fx-font-size: 18; -fx-background-color: rgba(206, 0, 0, 0.6); -fx-text-fill: white; -fx-padding: 5px;"/>
+
     <!-- <Button fx:id="inventoryButton" layoutX="700" layoutY="20" text="Inventory" onAction="#openInventory"/> -->
 
 </AnchorPane>

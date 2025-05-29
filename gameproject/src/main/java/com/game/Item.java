@@ -1,10 +1,6 @@
 package com.game;
 
 public abstract class Item {
-    String item = null;
-    int quantity = 0;
-    String description = null;
-    String type = null;
     private String name;
     private String imagePath;
 
@@ -21,5 +17,5 @@ public abstract class Item {
         return imagePath;
     }
 
-    public abstract void use();
+    public abstract void use(Player player);
 }

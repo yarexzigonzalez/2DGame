@@ -1,6 +1,7 @@
 package com.game; 
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
@@ -14,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.util.Duration;
 
 public class GameController {
     private Player playerStats = new Player(); // Create a new player object     
@@ -31,10 +33,7 @@ public class GameController {
     private Pane world;
     @FXML
     private Group gameView;
-
-    private HealthPotion potion; // Instance of HealthPotion
-    private ImageView potionImage; // ImageView for potion
-
+   
     private boolean jumping = false;
     private double velocityY = 0;
     private final double gravity = 0.5; // Gravity strength can adjust
@@ -55,9 +54,12 @@ public class GameController {
     private Rectangle enemy;
 
     private Enemy enemyStats = new Enemy(); // Create a new enemy object
+    @FXML
+    private Label healLabel, speedLabel, damageLabel;
     @FXML 
     private Label enemyHealthLabel;
-    
+    private List<Potion> activePotions = new ArrayList<>(); 
+    private List<ImageView> potionImages = new ArrayList<>(); 
     //private final List<Rectangle> platforms = new ArrayList<>(); // List to hold all platforms
     
     private List<Rectangle> platforms; // List to hold all platforms
@@ -66,7 +68,11 @@ public class GameController {
     @FXML
     public void initialize() {
         updateHealthLabel();
-        updateEnemyHealthLabel(); // Update enemy health label
+        updateEnemyHealthLabel();
+        // Hide labels initially
+        healLabel.setVisible(false); 
+        speedLabel.setVisible(false);
+        damageLabel.setVisible(false); 
         
         /*platforms.add(floatingPlatform);
         platforms.add(orangePlatform);
@@ -78,22 +84,22 @@ public class GameController {
             groundPlatform2
             // add more
         );
-        // Create potion instance
-        potion = new HealthPotion("Health Potion", getClass().getResource("/com/game/healthPotion.PNG").toExternalForm(), 10);
 
-        // Create ImageView for potion
-        potionImage = new ImageView(new Image(potion.getImagePath()));
-        potionImage.setFitWidth(32);
-        potionImage.setFitHeight(32);
+        // Add potions dynamically
+        Potion healthPotion = new HealthPotion("Health Potion", "/com/game/healthPotion.PNG", 3);
+        Potion damagePotion = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG", 3, 5);
+        Potion speedPotion = new SpeedPotion("Speed Potion", "/com/game/speedPotion.PNG", 2, 5);
 
-        // Position potion on green platform
-        double potionX = greenPlatform.getLayoutX() + 50; 
-        double potionY = greenPlatform.getLayoutY() - 55; // Put it on top of platform (32 is potion height)
-        potionImage.setLayoutX(potionX);
-        potionImage.setLayoutY(potionY);
+        double healthPotionX = greenPlatform.getLayoutX() + 50; 
+        double healthPotionY = greenPlatform.getLayoutY() - 55;
+        double speedPotionX = orangePlatform.getLayoutX() + 50; 
+        double speedPotionY = orangePlatform.getLayoutY() - 55;
+        double damagePotionX = floatingPlatform.getLayoutX() + 50; 
+        double damagePotionY = floatingPlatform.getLayoutY() - 55;
 
-        // Add potion to world pane
-        world.getChildren().add(potionImage);
+        addPotionToWorld(healthPotion, healthPotionX, healthPotionY);
+        addPotionToWorld(damagePotion, damagePotionX, damagePotionY);
+        addPotionToWorld(speedPotion, speedPotionX, speedPotionY);
 
         // Loop animation (allows for smooth movement)
         AnimationTimer timer = new AnimationTimer() {
@@ -114,8 +120,8 @@ public class GameController {
                 // Used .setTranslateX/Y randomly and it worked, so I guess it works
                 enemyHealthLabel.setTranslateX(enemy.getLayoutX());
                 enemyHealthLabel.setTranslateY(enemy.getLayoutY() - 30);
-                
 
+                
            }
         };
         timer.start();
@@ -177,6 +183,7 @@ public class GameController {
                 if (playerStats.isDead) {
                     System.out.println("Player is dead!");
                     // Handle player death later -> restart game, show game over screen
+                    restartGame();
                 }
                 System.out.println("Enemy hit player! Player health is now: " + playerStats.currentHealth);
             }
@@ -334,7 +341,8 @@ public class GameController {
 
         // Check if enemy is within vertical range (Y position)
         if (enemyInRange && Math.abs(playerY - enemyY) < 50) {
-            enemyStats.takeDamage(1);
+            int damage = playerStats.getPower(); // Get player's attack power
+            enemyStats.takeDamage(damage);
             updateEnemyHealthLabel(); 
             System.out.println("Enemy hit! Enemy health is now: " + enemyStats.currentHealth);
 
@@ -342,16 +350,26 @@ public class GameController {
             System.out.println("Missed! Enemy out of range.");
         }
     }
+
 // --------------------------------------------------------------------------------
 
     private void checkPotionCollision() {
-        if (potionImage != null && potionImage.isVisible() && player.getBoundsInParent().intersects(potionImage.getBoundsInParent())) {
-            //world.getChildren().remove(potionImage);
-            potionImage.setVisible(false);
-            playerStats.healthPotion(potion.getHealAmount());
-            potion.use();
+        for (int i = 0; i < potionImages.size(); i++) {
+            ImageView img = potionImages.get(i);
+            Potion potion = activePotions.get(i);
+            if (img.isVisible() && player.getBoundsInParent().intersects(img.getBoundsInParent())) {
+                img.setVisible(false);
+                potion.use(playerStats, this); // pass GameController for GUI updates
+                updateHealthLabel(); 
+
+                System.out.println("Potion used: " + potion.getName());
+                System.out.println("Player HP: " + playerStats.getCurrentHealth());
+                System.out.println("Player Power: " + playerStats.getPower());
+                System.out.println("Player Speed: " + playerStats.getMoveSpeed());
+            }
         }
     }
+    
 // --------------------------------------------------------------------------------
 
     private void checkWaterCollision() {
@@ -364,6 +382,7 @@ public class GameController {
             
         }
     }
+
 // --------------------------------------------------------------------------------
 
     private void restartGame() {
@@ -389,15 +408,21 @@ public class GameController {
         enemy.setLayoutY(enemyStartingY);
         enemyStats.isDead = false;
         enemyStats.currentHealth = enemyStats.maxHealth; // Reset enemy health
+        
+        // Reset player stats
+        playerStats.power = 1; 
+        playerStats.moveSpeed = 20;
 
         // Reset potion
-        if (potionImage != null) {
+        for (int i = 0; i < potionImages.size(); i++) {
+            ImageView potionImage = potionImages.get(i);
+            Potion potion = activePotions.get(i);
+            
             potionImage.setVisible(true);
-            double potionX = greenPlatform.getLayoutX() + 50; 
-            double potionY = greenPlatform.getLayoutY() - 55;
-            potionImage.setLayoutX(potionX);
-            potionImage.setLayoutY(potionY);
+            potionImage.setLayoutX(potion.getSpawnX());
+            potionImage.setLayoutY(potion.getSpawnY());
         }
+        
 
         // Reset health labels
         updateHealthLabel();
@@ -410,6 +435,47 @@ public class GameController {
         // Maybe add timer to game to track time played or something (later)
         //startTime = System.nanoTime();
         //gameTimer.start();
+    }
+
+// --------------------------------------------------------------------------------
+
+    private void addPotionToWorld(Potion potion, double x, double y) {
+        ImageView imageView = new ImageView(new Image(getClass().getResource(potion.getImagePath()).toExternalForm()));
+        imageView.setFitWidth(32);
+        imageView.setFitHeight(32);
+        imageView.setLayoutX(x);
+        imageView.setLayoutY(y);
+
+        // Save potion spawn position
+        potion.setSpawnPosition(x, y);
+    
+        activePotions.add(potion);
+        potionImages.add(imageView);
+        world.getChildren().add(imageView);
+    }
+
+// --------------------------------------------------------------------------------
+    public void showBoostMessage(String type, String text, int durationSeconds) {
+        // Pick label based on boost type (heal, speed, damage)
+        Label labelToUse = switch (type) {
+            // FYI: '->' in switch is Java 14+ syntax for cleaner case expressions
+            case "heal" -> healLabel;
+            case "speed" -> speedLabel;
+            case "damage" -> damageLabel;
+            default -> null;
+        };
+
+        if (labelToUse != null) {
+            labelToUse.setText(text); // Show message
+            labelToUse.setVisible(true);
+            // Short pause then hide message
+            PauseTransition pt = new PauseTransition(Duration.seconds(durationSeconds));
+            pt.setOnFinished(e -> {
+                labelToUse.setText(""); // clear text after duration
+                labelToUse.setVisible(false); // hide label again
+            });
+            pt.play(); // start timer
+        }
     }
 
 }

@@ -1,22 +1,24 @@
 package com.game;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Player extends Character{
-    // Player class repeats variables from Character class (redundant)
-    // Rewrote a bit to make less redundant
-    public int armor;
     public int attackDelay;
 
-    // Just set those in the constructor, not redeclaring them
     public Player(){
         this.currentHealth = 10;
         this.maxHealth = 10;
-        this.moveSpeed = 30;
-        this.power = 2;
-        this.armor = 0;
+        this.moveSpeed = 20;
+        this.power = 1;
         this.isDead = false;
-        this.attackDelay = 5; //not sure what to do with this yet
+    }
+
+    public int getCurrentHealth() {
+        return currentHealth;
+    }
+    public int getPower() {
+        return power;
+    }
+    public int getMoveSpeed() {
+        return (int) moveSpeed;
     }
 
     public void damaged(int power){
@@ -34,10 +36,6 @@ public class Player extends Character{
         }
     }
 
-    public void powerUpPotion(){
-        //trying to figure out a timer to make the powerup only last for a limited time
-    }
-
     private boolean facingRight = true; // Default facing direction
     
     public boolean isFacingRight() {
@@ -48,4 +46,51 @@ public class Player extends Character{
         this.facingRight = facingRight;
     }
     
+    public void heal(int amount) {
+        if (amount <= 0) {
+            System.out.println("Heal amount must be positive, IGNORED!");
+            return;
+        }
+        currentHealth = Math.min(currentHealth + amount, maxHealth);
+    }
+
+    // Shorter using lambda expressions, saw this in a video
+    public void applySpeedBoost(int boostAmount, int durationSeconds) {
+        if (boostAmount <= 0 || durationSeconds <= 0) {
+            System.out.println("Boost IGNORED! Invalid amount or duration.");
+            return;
+        }
+        moveSpeed += boostAmount;
+
+        // Threads do things in the background, 
+        //aso we can use them to wait for a certain amount of time
+        new Thread(() -> {
+            try {
+                Thread.sleep(durationSeconds * 1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            moveSpeed -= boostAmount;
+        }).start();
+    }
+    
+    public void applyDamageBoost(int boostAmount, int durationSeconds) {
+        if (boostAmount <= 0 || durationSeconds <= 0) {
+            System.out.println("Boost IGNORED! Invalid amount or duration.");
+            return;
+        }
+        
+        int originalPower = power; 
+        power += boostAmount;
+    
+        new Thread(() -> {
+            try {
+                Thread.sleep(durationSeconds * 1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            power = originalPower;
+            System.out.println("Damage boost ended. Power reverted to: " + power);
+        }).start();
+    }
 }

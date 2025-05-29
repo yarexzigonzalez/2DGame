@@ -42,7 +42,7 @@ public class GameController {
     private final double maxFallSpeed = 15; // Maximum falling speed can adjust
     // (Ashley's suggestion)
     @FXML
-    private Rectangle groundPlatform;
+    private Rectangle groundPlatform, groundPlatform2;
     @FXML 
     private Rectangle floatingPlatform; // Matches element type in FXML
     @FXML
@@ -74,7 +74,8 @@ public class GameController {
 
         // More efficient way to initialize platforms?
         platforms = Arrays.asList(
-            groundPlatform, floatingPlatform, orangePlatform, greenPlatform
+            groundPlatform, floatingPlatform, orangePlatform, greenPlatform,
+            groundPlatform2
             // add more
         );
         // Create potion instance

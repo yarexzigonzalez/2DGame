@@ -18,14 +18,14 @@
         <!-- Game world pane (part that gon move) -->
         <Pane fx:id="world" prefWidth="2000" prefHeight="1080">
             <!-- Water -->
-            <Rectangle fx:id="water" layoutX="1980" layoutY="1000" width="2000" height="80" fill="blue"/>
+            <Rectangle fx:id="water" layoutX="888" layoutY="1000" width="360" height="80" fill="blue"/>
             <!-- UI: Enemy Health Bar -->
             <Label fx:id="enemyHealthLabel" layoutX="900" layoutY="30" text="Enemy HP: 10/10"/>
             <Rectangle fx:id="enemyHealthBar" fill="DarkRed" width="50" height="12"/>
             
             <!-- Test platform scrolling -->
-            <Rectangle fx:id="orangePlatform" layoutX="1800" layoutY="870" width="150" height="20" fill="orange"/>
-            <Rectangle fx:id="greenPlatform" layoutX="460" layoutY="750" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="orangePlatform" layoutX="1600" layoutY="870" width="150" height="20" fill="orange"/>
+            <Rectangle fx:id="greenPlatform" layoutX="1060" layoutY="750" width="150" height="20" fill="green"/>
 
             <!-- Enemy Rectangle -->
             <Rectangle fx:id="enemy" layoutX="150" layoutY="940" width="40" height="40" fill="red"/>
@@ -33,11 +33,12 @@
             <!-- Player -->
             <Rectangle fx:id="player" x="100" y="850" width="40" height="40" fill="blue"/>
 
-            <!-- Ground Platform -->
-            <Rectangle fx:id="groundPlatform" layoutX="-109" layoutY="980" width="2000" height="100" fill="darkgreen"/>
+            <!-- Ground Platforms -->
+            <Rectangle fx:id="groundPlatform" layoutX="-109" layoutY="980" width="1000" height="100" fill="darkgreen"/>
+            <Rectangle fx:id="groundPlatform2" layoutX="1247" layoutY="980" width="1000" height="100" fill="darkgreen"/>
 
             <!-- Floating Platform -->
-            <Rectangle fx:id="floatingPlatform" layoutX="300" layoutY="850" width="150" height="20" fill="darkslateblue"/>
+            <Rectangle fx:id="floatingPlatform" layoutX="888" layoutY="850" width="150" height="20" fill="darkslateblue"/>
         </Pane>
     </Group>
 

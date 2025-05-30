@@ -42,7 +42,7 @@
             <Rectangle fx:id="floatingPlatform12" layoutX="4982" layoutY="579" width="150" height="20" fill="green"/>
             <Rectangle fx:id="floatingPlatform13" layoutX="5200" layoutY="462" width="150" height="20" fill="green"/>
             <Rectangle fx:id="floatingPlatform14" layoutX="4200" layoutY="924" width="150" height="20" fill="green"/>
-            <Rectangle fx:id="floatingPlatform15" layoutX="5156" layoutY="312" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform15" layoutX="5156" layoutY="312" width="300" height="20" fill="green"/>
 
             <!-- Wall Obstacle -->
             <Rectangle fx:id="wall" layoutX="5450" layoutY="371" width="135" height="609" fill="green"/>
@@ -57,7 +57,7 @@
             <Rectangle fx:id="groundPlatform" layoutX="-115" layoutY="980" width="490" height="100" fill="darkgreen"/>
             <Rectangle fx:id="groundPlatform2" layoutX="610" layoutY="980" width="1098" height="100" fill="darkgreen"/>
             <Rectangle fx:id="groundPlatform3" layoutX="2395" layoutY="980" width="1489" height="100" fill="darkgreen"/>
-            <Rectangle fx:id="groundPlatform4" layoutX="4333" layoutY="980" width="2034" height="100" fill="darkgreen"/>
+            <Rectangle fx:id="groundPlatform4" layoutX="4333" layoutY="980" width="4034" height="100" fill="darkgreen"/>
         </Pane>
     </Group>
 

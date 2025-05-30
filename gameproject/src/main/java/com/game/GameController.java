@@ -56,6 +56,9 @@ public class GameController {
     private Rectangle water;
     @FXML
     private Rectangle enemy;
+    // Cooldown stuff
+    private long lastSpikeDamageTime = 0; // Last time spikes were checked
+    private final long spikeDamageCooldown = 1000_000_000L; // 1 second in nanoseconds
 
     private Enemy enemyStats = new Enemy(); // Create a new enemy object
     @FXML
@@ -64,8 +67,7 @@ public class GameController {
     private Label enemyHealthLabel;
     private List<Potion> activePotions = new ArrayList<>(); 
     private List<ImageView> potionImages = new ArrayList<>(); 
-    //private final List<Rectangle> platforms = new ArrayList<>(); // List to hold all platforms
-    
+    private List<ImageView> spikeImages = new ArrayList<>();
     private List<Rectangle> platforms; // List to hold all platforms
 // ------------------------------------------------------------------------------------
 
@@ -111,6 +113,22 @@ public class GameController {
         addPotionToWorld(damagePotion, damagePotionX, damagePotionY);
         addPotionToWorld(speedPotion, speedPotionX, speedPotionY);
 
+        // Add spikes to the world
+        // Far left 
+        addSpikeToWorld("/com/game/onespike.png", floatingPlatform5.getLayoutX(), floatingPlatform5.getLayoutY() - 60);
+        // Far right 
+        addSpikeToWorld("/com/game/onespike.png", floatingPlatform5.getLayoutX() + floatingPlatform5.getWidth() - 50, floatingPlatform5.getLayoutY() - 60);
+        // Middle of ground platform
+        double middleGroundX = groundPlatform4.getLayoutX() + (groundPlatform.getWidth() / 2) - 40;
+        addSpikeToWorld("/com/game/spikes.png", middleGroundX, groundPlatform.getLayoutY() - 45);
+        // Floating platform 7
+        addSpikeToWorld("/com/game/onespike.png", floatingPlatform7.getLayoutX() + 20, floatingPlatform7.getLayoutY() - 60);
+        // Edge of floatingPlatform12
+        addSpikeToWorld("/com/game/onespike.png", floatingPlatform12.getLayoutX(), floatingPlatform12.getLayoutY() - 60);
+        // Edge of floatingPlatform11
+        addSpikeToWorld("/com/game/onespike.png", floatingPlatform11.getLayoutX() + floatingPlatform11.getWidth() - 50, floatingPlatform11.getLayoutY() - 60);
+
+
         // Loop animation (allows for smooth movement)
         AnimationTimer timer = new AnimationTimer() {
            @Override
@@ -122,6 +140,7 @@ public class GameController {
                 checkPlayerEnemyCollision(); // Check for player-enemy collision
                 checkPotionCollision(); 
                 checkWaterCollision();
+                checkSpikeCollision(); 
 
                 // Show player health bar and label
                 enemyHealthBar.setLayoutX(enemy.getLayoutX());
@@ -518,6 +537,40 @@ public class GameController {
             }
         }
         return false;
+    }
+// --------------------------------------------------------------------------------
+
+    private void addSpikeToWorld(String imagePath, double x, double y) {
+        ImageView spike = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
+        spike.setFitWidth(60); 
+        spike.setFitHeight(60); 
+        spike.setLayoutX(x);
+        spike.setLayoutY(y);
+        world.getChildren().add(spike);
+        spikeImages.add(spike);
+    }
+// --------------------------------------------------------------------------------
+    private void checkSpikeCollision() {
+        long now = System.nanoTime();
+        if (now - lastSpikeDamageTime < spikeDamageCooldown) {
+            return; // skip, still in cooldown
+        }
+        for (ImageView spike : spikeImages) {
+            if (spike.isVisible() && player.getBoundsInParent().intersects(spike.getBoundsInParent())) {
+                System.out.println("OUCH! Player hit spikes!");
+                playerStats.damaged(1); // Assuming spikes deal 1 damage
+                updateHealthLabel();
+                if (playerStats.isDead) {
+                    System.out.println("Player is dead from spikes!");
+                    restartGame(); 
+                } else {
+                    System.out.println("Player health is now: " + playerStats.getCurrentHealth());
+                }
+
+                lastSpikeDamageTime = now; // Update last damage time
+                break; 
+            }
+        } 
     }
 
 

@@ -245,19 +245,25 @@ public class GameController {
 
     @FXML 
     public void onKeyPressed(KeyEvent event) {
+        double currentX = player.getX();
+        double moveAmount = playerStats.moveSpeed; // Amount to move left/right
         // Updated options to use left/right arrow keys or A/D keys
         switch (event.getCode()) {
             case LEFT:
             case A:
-                player.setX(player.getX() - playerStats.moveSpeed);
-                updateCamera(); // Update camera position
-                playerStats.setFacingRight(false); 
+                if (!isCollidingHorizontally(currentX - moveAmount)) {
+                    player.setX(currentX - moveAmount);
+                    updateCamera(); // Update camera position
+                    playerStats.setFacingRight(false); 
+                }
                 break;
             case RIGHT:
             case D:
-                player.setX(player.getX() + playerStats.moveSpeed);
-                updateCamera(); // Update camera position
-                playerStats.setFacingRight(true); 
+                if (!isCollidingHorizontally(currentX + moveAmount)) {
+                    player.setX(currentX + moveAmount);
+                    updateCamera(); // Update camera position
+                    playerStats.setFacingRight(true); 
+                }
                 break;
             case F:
                 swingSword();
@@ -487,5 +493,32 @@ public class GameController {
             pt.play(); // start timer
         }
     }
+// --------------------------------------------------------------------------------
+
+    private boolean isCollidingHorizontally(double nextX) {
+        Bounds futureBounds = player.getBoundsInParent();
+
+        // Loops through all platforms to check for side (left/right) collisions 
+        // — works for walls
+        for (Rectangle platform : platforms) {
+            Bounds platformBounds = platform.getBoundsInParent();
+
+            // Predict horizontal position
+            double predictedMinX = futureBounds.getMinX() + (nextX - player.getX());
+            double predictedMaxX = futureBounds.getMaxX() + (nextX - player.getX());
+            // Check if player and wall are on same vertical level
+            boolean verticalOverlap = futureBounds.getMaxY() > platformBounds.getMinY() &&
+                                    futureBounds.getMinY() < platformBounds.getMaxY();
+            // Check if player will overlap/hit wall from side
+            boolean horizontalOverlap = predictedMaxX > platformBounds.getMinX() &&
+                                        predictedMinX < platformBounds.getMaxX();
+            // If both overlap, its a collision, so block movement
+            if (verticalOverlap && horizontalOverlap) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

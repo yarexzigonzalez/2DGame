@@ -8,24 +8,44 @@
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.game.GameController"
-            prefWidth="1920" prefHeight="1080"
+            prefWidth="6361" prefHeight="1080"
             onKeyPressed="#onKeyPressed"
             focusTraversable="true">
     <!-- Camera/View Group -->
     <Group fx:id="gameView" layoutX="0" layoutY="0">
+
         <!-- Background -->
-        <Rectangle width="2000" height="1080" fill="lightblue"/>
+        <Rectangle width="6361" height="1080" fill="lightblue"/>
+
         <!-- Game world pane (part that gon move) -->
-        <Pane fx:id="world" prefWidth="2000" prefHeight="1080">
+        <Pane fx:id="world" prefWidth="6366" prefHeight="1080">
+
             <!-- Water -->
-            <Rectangle fx:id="water" layoutX="888" layoutY="1000" width="360" height="80" fill="blue"/>
+            <Rectangle fx:id="water" layoutX="0" layoutY="1000" width="5361" height="80" fill="blue"/>
+            
             <!-- UI: Enemy Health Bar -->
             <Label fx:id="enemyHealthLabel" layoutX="900" layoutY="30" text="Enemy HP: 10/10"/>
             <Rectangle fx:id="enemyHealthBar" fill="DarkRed" width="50" height="12"/>
             
-            <!-- Test platform scrolling -->
-            <Rectangle fx:id="orangePlatform" layoutX="1600" layoutY="870" width="150" height="20" fill="orange"/>
-            <Rectangle fx:id="greenPlatform" layoutX="1060" layoutY="750" width="150" height="20" fill="green"/>
+            <!-- Floating Platforms -->
+            <Rectangle fx:id="floatingPlatform" layoutX="300" layoutY="850" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform2" layoutX="488" layoutY="750" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform3" layoutX="1075" layoutY="830" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform4" layoutX="1649" layoutY="850" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform5" layoutX="1843" layoutY="750" width="437" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform6" layoutX="2325" layoutY="849" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform7" layoutX="3136" layoutY="859" width="430" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform8" layoutX="3416" layoutY="741" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform9" layoutX="3900" layoutY="859" width="250" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform10" layoutX="4936" layoutY="859" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform11" layoutX="5156" layoutY="729" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform12" layoutX="4982" layoutY="579" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform13" layoutX="5200" layoutY="462" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform14" layoutX="4200" layoutY="924" width="150" height="20" fill="green"/>
+            <Rectangle fx:id="floatingPlatform15" layoutX="5156" layoutY="312" width="150" height="20" fill="green"/>
+
+            <!-- Wall Obstacle -->
+            <Rectangle fx:id="wall" layoutX="5450" layoutY="371" width="135" height="609" fill="green"/>
 
             <!-- Enemy Rectangle -->
             <Rectangle fx:id="enemy" layoutX="150" layoutY="940" width="40" height="40" fill="red"/>
@@ -34,11 +54,10 @@
             <Rectangle fx:id="player" x="100" y="850" width="40" height="40" fill="blue"/>
 
             <!-- Ground Platforms -->
-            <Rectangle fx:id="groundPlatform" layoutX="-109" layoutY="980" width="1000" height="100" fill="darkgreen"/>
-            <Rectangle fx:id="groundPlatform2" layoutX="1247" layoutY="980" width="1000" height="100" fill="darkgreen"/>
-
-            <!-- Floating Platform -->
-            <Rectangle fx:id="floatingPlatform" layoutX="888" layoutY="850" width="150" height="20" fill="darkslateblue"/>
+            <Rectangle fx:id="groundPlatform" layoutX="-115" layoutY="980" width="490" height="100" fill="darkgreen"/>
+            <Rectangle fx:id="groundPlatform2" layoutX="610" layoutY="980" width="1098" height="100" fill="darkgreen"/>
+            <Rectangle fx:id="groundPlatform3" layoutX="2395" layoutY="980" width="1489" height="100" fill="darkgreen"/>
+            <Rectangle fx:id="groundPlatform4" layoutX="4333" layoutY="980" width="2034" height="100" fill="darkgreen"/>
         </Pane>
     </Group>
 

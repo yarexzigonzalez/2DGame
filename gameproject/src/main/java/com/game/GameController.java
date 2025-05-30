@@ -2,6 +2,7 @@ package com.game;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
@@ -33,7 +34,9 @@ public class GameController {
     private Pane world;
     @FXML
     private Group gameView;
-   
+    private double ViewWidth = 800; // Width of the game view
+    private double WorldWidth = 0; // Width of the level/Dynamically use actual width
+
     private boolean jumping = false;
     private double velocityY = 0;
     private final double gravity = 0.5; // Gravity strength can adjust
@@ -41,13 +44,14 @@ public class GameController {
     private final double maxFallSpeed = 15; // Maximum falling speed can adjust
     // (Ashley's suggestion)
     @FXML
-    private Rectangle groundPlatform, groundPlatform2;
+    private Rectangle groundPlatform, groundPlatform2, groundPlatform3, groundPlatform4;
+    @FXML
+    private Rectangle wall;
     @FXML 
-    private Rectangle floatingPlatform; // Matches element type in FXML
-    @FXML
-    private Rectangle orangePlatform; 
-    @FXML
-    private Rectangle greenPlatform;
+    private Rectangle floatingPlatform, floatingPlatform2, floatingPlatform3, floatingPlatform4, 
+    floatingPlatform5, floatingPlatform6, floatingPlatform7, floatingPlatform8, floatingPlatform9, 
+    floatingPlatform10, floatingPlatform11, floatingPlatform12, floatingPlatform13, floatingPlatform14,
+    floatingPlatform15; 
     @FXML
     private Rectangle water;
     @FXML
@@ -67,21 +71,27 @@ public class GameController {
 
     @FXML
     public void initialize() {
+        // Delay until everything good and loaded
+        Platform.runLater(() -> {
+            WorldWidth = world.getWidth(); // Get actual width of the world
+            System.out.println("World width: " + WorldWidth);
+        });
         updateHealthLabel();
         updateEnemyHealthLabel();
         // Hide labels initially
         healLabel.setVisible(false); 
         speedLabel.setVisible(false);
         damageLabel.setVisible(false); 
-        
-        /*platforms.add(floatingPlatform);
-        platforms.add(orangePlatform);
-        platforms.add(greenPlatform);*/
 
         // More efficient way to initialize platforms?
         platforms = Arrays.asList(
-            groundPlatform, floatingPlatform, orangePlatform, greenPlatform,
-            groundPlatform2
+            groundPlatform, groundPlatform2, groundPlatform3, groundPlatform4, floatingPlatform,
+            floatingPlatform2, floatingPlatform3, floatingPlatform4, floatingPlatform5,
+            floatingPlatform6, floatingPlatform7, floatingPlatform8, floatingPlatform9,
+            floatingPlatform10, floatingPlatform11, floatingPlatform12, floatingPlatform13,
+            floatingPlatform14, wall, floatingPlatform15
+            /*orangePlatform, greenPlatform,*/
+            
             // add more
         );
 
@@ -90,10 +100,10 @@ public class GameController {
         Potion damagePotion = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG", 3, 5);
         Potion speedPotion = new SpeedPotion("Speed Potion", "/com/game/speedPotion.PNG", 2, 5);
 
-        double healthPotionX = greenPlatform.getLayoutX() + 50; 
-        double healthPotionY = greenPlatform.getLayoutY() - 55;
-        double speedPotionX = orangePlatform.getLayoutX() + 50; 
-        double speedPotionY = orangePlatform.getLayoutY() - 55;
+        double healthPotionX = floatingPlatform2.getLayoutX() + 50; 
+        double healthPotionY = floatingPlatform2.getLayoutY() - 55;
+        double speedPotionX = floatingPlatform3.getLayoutX() + 50; 
+        double speedPotionY = floatingPlatform3.getLayoutY() - 55;
         double damagePotionX = floatingPlatform.getLayoutX() + 50; 
         double damagePotionY = floatingPlatform.getLayoutY() - 55;
 
@@ -295,15 +305,15 @@ public class GameController {
      but gameView stays still
      - Group is needed to hold world without affecting other UI stuff like the health bar
      */
-    private final double ViewWidth = 800; // Width of the game view
-    private final double WorldWidth = 2000; // Width of the level
-
     private void updateCamera() {
         /* 
         - Center the camera on the player as screen moves instead of player going off screen.
         - So bascially world "slides/scrolls" left/right to follow player
         - Works by shifting Pane that holds everything in the world
         */
+        if (WorldWidth <= 0) {
+            return; // If world width is not set yet, do nothing
+        }
         // Get the player's X position and center the camera on them
         double playerX = player.getX() + player.getWidth() / 2;
         // How far to move the camera left/right to center player

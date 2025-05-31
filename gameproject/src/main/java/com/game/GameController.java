@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,8 +29,6 @@ public class GameController {
     private Label healthLabel;
     @FXML
     private Rectangle healthBar;
-    @FXML
-    private Rectangle enemyHealthBar; 
     @FXML
     private Pane world;
     @FXML
@@ -54,21 +53,24 @@ public class GameController {
     floatingPlatform15; 
     @FXML
     private Rectangle water;
-    @FXML
-    private Rectangle enemy;
+   
     // Cooldown stuff
     private long lastSpikeDamageTime = 0; // Last time spikes were checked
     private final long spikeDamageCooldown = 1000_000_000L; // 1 second in nanoseconds
-
-    private Enemy enemyStats = new Enemy(); // Create a new enemy object
     @FXML
     private Label healLabel, speedLabel, damageLabel;
-    @FXML 
-    private Label enemyHealthLabel;
+
     private List<Potion> activePotions = new ArrayList<>(); 
     private List<ImageView> potionImages = new ArrayList<>(); 
     private List<ImageView> spikeImages = new ArrayList<>();
     private List<Rectangle> platforms; // List to hold all platforms
+    private List<ImageView> enemies = new ArrayList<>();
+    List<Enemy> enemyStats = new ArrayList<>(); 
+    List<Label> enemyHealthLabels = new ArrayList<>();
+    List<Rectangle> enemyHealthBars = new ArrayList<>();
+    // Holds patrol x boundaries for each enemy to prevent them from chasing forever
+    // aka from floating over water like before....
+    List<Double[]> enemyPatrolBounds = new ArrayList<>(); 
 // ------------------------------------------------------------------------------------
 
     @FXML
@@ -79,7 +81,6 @@ public class GameController {
             System.out.println("World width: " + WorldWidth);
         });
         updateHealthLabel();
-        updateEnemyHealthLabel();
         // Hide labels initially
         healLabel.setVisible(false); 
         speedLabel.setVisible(false);
@@ -92,9 +93,6 @@ public class GameController {
             floatingPlatform6, floatingPlatform7, floatingPlatform8, floatingPlatform9,
             floatingPlatform10, floatingPlatform11, floatingPlatform12, floatingPlatform13,
             floatingPlatform14, wall, floatingPlatform15
-            /*orangePlatform, greenPlatform,*/
-            
-            // add more
         );
 
         // Add potions dynamically
@@ -102,12 +100,12 @@ public class GameController {
         Potion damagePotion = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG", 3, 5);
         Potion speedPotion = new SpeedPotion("Speed Potion", "/com/game/speedPotion.PNG", 2, 5);
 
-        double healthPotionX = floatingPlatform2.getLayoutX() + 50; 
-        double healthPotionY = floatingPlatform2.getLayoutY() - 55;
-        double speedPotionX = floatingPlatform3.getLayoutX() + 50; 
-        double speedPotionY = floatingPlatform3.getLayoutY() - 55;
-        double damagePotionX = floatingPlatform.getLayoutX() + 50; 
-        double damagePotionY = floatingPlatform.getLayoutY() - 55;
+        double healthPotionX = wall.getLayoutX() + 50; 
+        double healthPotionY = wall.getLayoutY() - 55;
+        double speedPotionX = floatingPlatform8.getLayoutX() + 50; 
+        double speedPotionY = floatingPlatform8.getLayoutY() - 55;
+        double damagePotionX = floatingPlatform3.getLayoutX() + 50; 
+        double damagePotionY = floatingPlatform3.getLayoutY() - 55;
 
         addPotionToWorld(healthPotion, healthPotionX, healthPotionY);
         addPotionToWorld(damagePotion, damagePotionX, damagePotionY);
@@ -128,6 +126,8 @@ public class GameController {
         // Edge of floatingPlatform11
         addSpikeToWorld("/com/game/onespike.png", floatingPlatform11.getLayoutX() + floatingPlatform11.getWidth() - 50, floatingPlatform11.getLayoutY() - 60);
 
+        // Set enemy image
+        spawnEnemies();
 
         // Loop animation (allows for smooth movement)
         AnimationTimer timer = new AnimationTimer() {
@@ -136,21 +136,11 @@ public class GameController {
                 applyGravity();
                 /*  Every frame, runs applyGravity which check for 
                 collisions and update player position */
-                moveEnemy(); // Call the enemy movement function
-                checkPlayerEnemyCollision(); // Check for player-enemy collision
                 checkPotionCollision(); 
                 checkWaterCollision();
                 checkSpikeCollision(); 
-
-                // Show player health bar and label
-                enemyHealthBar.setLayoutX(enemy.getLayoutX());
-                enemyHealthBar.setLayoutY(enemy.getLayoutY() - 15);
-                // Doesn't work with .setLayoutX/Y, for some reason
-                // Used .setTranslateX/Y randomly and it worked, so I guess it works
-                enemyHealthLabel.setTranslateX(enemy.getLayoutX());
-                enemyHealthLabel.setTranslateY(enemy.getLayoutY() - 30);
-
-                
+                moveEnemies();
+                checkPlayerEnemyCollisions();
            }
         };
         timer.start();
@@ -158,63 +148,65 @@ public class GameController {
 
 // ------------------------------------------------------------------------------------
 
-    private void moveEnemy() {
-        double playerX = player.getX();
-        double enemyX = enemy.getX();
-        double distance = Math.abs(playerX - enemyX);
-        double speed = enemyStats.moveSpeed; // Enemy speed
-
-        if (distance > speed) {
-            // Move enemy toward player
-            if (playerX < enemyX) {
-                enemy.setX(enemyX - speed);
-            } else if (playerX > enemyX) {
-                enemy.setX(enemyX + speed);
-            } // Let enemy move off screen for now since screen will follow later
-        } else {
-            // Snap enemy nect to playeer so collision works
-            enemy.setX(playerX);
+    private void moveEnemies() {
+        for (int i = 0; i < enemies.size(); i++) {
+            ImageView enemy = enemies.get(i);
+            Enemy stats = enemyStats.get(i);
+            Double[] patrol = enemyPatrolBounds.get(i);
+    
+            if (stats.isDead) continue;
+    
+            double playerX = player.getX();
+            double enemyX = enemy.getLayoutX();
+            double speed = stats.moveSpeed;
+    
+            if (Math.abs(playerX - enemyX) > speed) {
+                // Player is to the left and within patrol range
+                if (playerX < enemyX && enemyX - speed >= patrol[0]) {
+                    enemy.setLayoutX(enemyX - speed);
+                // Player is to the right and within patrol range
+                } else if (playerX > enemyX && enemyX + speed <= patrol[1]) {
+                    enemy.setLayoutX(enemyX + speed);
+                }
+            }
+    
+            // Update health bar and label to stay stuck to enemy
+            enemyHealthBars.get(i).setX(enemy.getLayoutX());
+            enemyHealthBars.get(i).setY(enemy.getLayoutY() - 15);
+    
+            enemyHealthLabels.get(i).setLayoutX(enemy.getLayoutX());
+            enemyHealthLabels.get(i).setLayoutY(enemy.getLayoutY() - 30);
         }
-
-        // Update enemy health bar and label position so it follows enemy!
-        double healthBarOffsetY = 15; 
-        double labelOffsetY = 30; 
-
-        // .set for shapes, .setLayout for labels/imageview/pane (note to self)
-        enemyHealthBar.setX(enemy.getX());
-        enemyHealthBar.setY(enemy.getY() - healthBarOffsetY);
-
-        enemyHealthLabel.setLayoutX(enemy.getX());
-        enemyHealthLabel.setLayoutY(enemy.getY() - labelOffsetY);
     }
 
 // ------------------------------------------------------------------------------------
 
-    private void checkPlayerEnemyCollision() {
-        if (playerStats.isDead || enemyStats.isDead) {
-            enemy.setVisible(false); // Hide enemy if dead
-            enemyHealthLabel.setVisible(false); // Hide enemy health label if dead
-            return; // No collision check if player or enemy is dead
-        }
-        // Get bounds for player and enemy
-        Bounds playerBounds = player.getBoundsInParent();
-        Bounds enemyBounds = enemy.getBoundsInParent();
-        // Check for collision
-        if (playerBounds.intersects(enemyBounds)) {
-            if (enemyStats.canAttack()) {
-                // Collision detected! Player takes damage
-                playerStats.damaged(enemyStats.power); // Assuming enemy deals 1 damage
-                // Will add something to show damage on screen later:
-                // red flash on player, health bar decrease, sound effect, etc....
-                enemyStats.attackedPlayer(); // Update last damage time
-                updateHealthLabel(); // Update health label after taking damage
-                
-                if (playerStats.isDead) {
-                    System.out.println("Player is dead!");
-                    // Handle player death later -> restart game, show game over screen
-                    restartGame();
+    private void checkPlayerEnemyCollisions() {
+        for (int i = 0; i < enemies.size(); i++) {
+            ImageView enemy = enemies.get(i);
+            Enemy stats = enemyStats.get(i);
+    
+            // If enemy is dead, hide them and their UI
+            if (stats.isDead) {
+                if (enemy.isVisible()) {
+                    enemy.setVisible(false); // Remove enemy
+                    enemyHealthLabels.get(i).setVisible(false); // Remove label
+                    enemyHealthBars.get(i).setVisible(false);   // Remove health bar
+                    System.out.println("Enemy " + i + " has died and disappeared.");
                 }
-                System.out.println("Enemy hit player! Player health is now: " + playerStats.currentHealth);
+                continue; // Dead enemies do nothing, skip rest for this enemy
+            }
+    
+            if (playerStats.isDead) continue;
+    
+            if (player.getBoundsInParent().intersects(enemy.getBoundsInParent())) {
+                if (stats.canAttack()) {
+                    playerStats.damaged(stats.power);
+                    stats.attackedPlayer(); // enemy attack cooldown
+                    updateHealthLabel();
+                    if (playerStats.isDead) restartGame();
+                    System.out.println("Enemy " + i + " hit player! Player HP: " + playerStats.currentHealth);
+                }
             }
         }
     }
@@ -314,13 +306,6 @@ public class GameController {
         healthBar.setWidth(healthPercentage * 200); // 200 is the max width of the health bar
     }
 
-    private void updateEnemyHealthLabel() {
-        enemyHealthLabel.setVisible(true); 
-        enemyHealthLabel.setText("Enemy HP: " + enemyStats.currentHealth + "/" + enemyStats.maxHealth);
-        double healthPercentage = (double) enemyStats.currentHealth / enemyStats.maxHealth;
-        enemyHealthBar.setWidth(healthPercentage * 50);
-    }
-
 // --------------------------------------------------------------------------------
 
     /*
@@ -352,39 +337,50 @@ public class GameController {
     }
 
 // --------------------------------------------------------------------------------
-    
+
+    // No visual atm still
     private void swingSword() {
-        if (enemyStats.isDead) {
-            return; // No attack if enemy is dead
-        }
-        // Get actuall positions of player and enemy
-        double playerX = player.getBoundsInParent().getMinX();
-        double playerY = player.getBoundsInParent().getMinY();
-        double enemyX = enemy.getBoundsInParent().getMinX();
-        double enemyY = enemy.getBoundsInParent().getMinY();
+        for (int i = 0; i < enemies.size(); i++) {
+            ImageView enemy = enemies.get(i);
+            Enemy stats = enemyStats.get(i);
+    
+            if (stats.isDead) continue; // skip if already deaad
+    
+            double playerX = player.getBoundsInParent().getMinX();
+            double playerY = player.getBoundsInParent().getMinY();
+            double enemyX = enemy.getBoundsInParent().getMinX();
+            double enemyY = enemy.getBoundsInParent().getMinY();
+            double enemyRight = enemy.getBoundsInParent().getMaxX();
+            double range = 110;
+    
+            double playerRight = playerX + range;
+            double playerLeft = playerX - range;
 
-        double range = 110; // Attack range
-        boolean enemyInRange = false;
-        // Check if enemy is within attack range based on player's facing direction
-        if (playerStats.isFacingRight()) {
-            enemyInRange = enemyX > playerX &&
-                           enemyX <= playerX + range;
-        } else {
-            enemyInRange = enemyX < playerX &&
-                           enemyX >= playerX - range;
-        }
-
-        // Check if enemy is within vertical range (Y position)
-        if (enemyInRange && Math.abs(playerY - enemyY) < 50) {
-            int damage = playerStats.getPower(); // Get player's attack power
-            enemyStats.takeDamage(damage);
-            updateEnemyHealthLabel(); 
-            System.out.println("Enemy hit! Enemy health is now: " + enemyStats.currentHealth);
-
-        } else {
-            System.out.println("Missed! Enemy out of range.");
+            // Depending on if player is facing left or right, checks
+            // if enemy is n that attack direction 
+            boolean inRange = playerStats.isFacingRight()
+                ? enemyX <= playerRight && enemyRight >= playerX
+                : enemyRight >= playerLeft && enemyX <= playerX;
+            
+            // Enemy is close horizontally and about same height
+            if (inRange && Math.abs(playerY - enemyY) < 50) {
+                int damage = playerStats.getPower();
+                stats.takeDamage(damage);
+                updateEnemyHealthLabel(i);
+                System.out.println("Hit enemy " + i + "! HP now: " + stats.currentHealth);
+                break; // only hit one enemy per swing
+            }
         }
     }
+    
+    // Updates enemy's HP label/bar after taking damage
+    private void updateEnemyHealthLabel(int i) {
+        Enemy stats = enemyStats.get(i);
+        enemyHealthLabels.get(i).setText("Enemy HP: " + stats.currentHealth + "/" + stats.maxHealth);
+        double percent = (double) stats.currentHealth / stats.maxHealth;
+        enemyHealthBars.get(i).setWidth(percent * 50);
+    }
+    
 
 // --------------------------------------------------------------------------------
 
@@ -426,10 +422,7 @@ public class GameController {
         // Player x and y positions
         double startingX = 100; // Starting X position of player
         double startingY = 850; // Starting Y position of player
-        // Enemy x and y positions
-        double enemyStartingX = 200; // Starting X position of enemy
-        double enemyStartingY = 937; // Starting Y position of enemy
-
+    
         // Reset player
         player.setX(startingX);
         player.setY(startingY);
@@ -437,12 +430,25 @@ public class GameController {
         velocityY = 0; 
         playerStats.currentHealth = playerStats.maxHealth; 
 
-        // Reset enemy
-        enemy.setVisible(true); 
-        enemy.setLayoutX(enemyStartingX);
-        enemy.setLayoutY(enemyStartingY);
-        enemyStats.isDead = false;
-        enemyStats.currentHealth = enemyStats.maxHealth; // Reset enemy health
+        // Reset enemies
+        for (int i = 0; i < enemies.size(); i++) {
+            ImageView enemy = enemies.get(i);
+            Enemy stats = enemyStats.get(i);
+            Rectangle healthBar = enemyHealthBars.get(i);
+            Label healthLabel = enemyHealthLabels.get(i);
+            double maxWidth = 50; // Max width of health bar
+
+            // Reset visibility and stats
+            enemy.setVisible(true);
+            stats.isDead = false;
+            stats.currentHealth = stats.maxHealth;
+
+            // Reset health bar visuals
+            healthBar.setVisible(true);
+            healthBar.setWidth((stats.currentHealth / (double) stats.maxHealth) * maxWidth);
+            healthLabel.setVisible(true);
+            healthLabel.setText("HP: " + stats.currentHealth);
+        }
         
         // Reset player stats
         playerStats.power = 1; 
@@ -457,11 +463,9 @@ public class GameController {
             potionImage.setLayoutX(potion.getSpawnX());
             potionImage.setLayoutY(potion.getSpawnY());
         }
-        
 
-        // Reset health labels
+        // Reset health label
         updateHealthLabel();
-        updateEnemyHealthLabel();
 
         // Reset camera position
         world.setLayoutX(0); // Reset camera to start position
@@ -490,6 +494,7 @@ public class GameController {
     }
 
 // --------------------------------------------------------------------------------
+    
     public void showBoostMessage(String type, String text, int durationSeconds) {
         // Pick label based on boost type (heal, speed, damage)
         Label labelToUse = switch (type) {
@@ -512,6 +517,7 @@ public class GameController {
             pt.play(); // start timer
         }
     }
+
 // --------------------------------------------------------------------------------
 
     private boolean isCollidingHorizontally(double nextX) {
@@ -550,6 +556,7 @@ public class GameController {
         spikeImages.add(spike);
     }
 // --------------------------------------------------------------------------------
+    
     private void checkSpikeCollision() {
         long now = System.nanoTime();
         if (now - lastSpikeDamageTime < spikeDamageCooldown) {
@@ -571,6 +578,44 @@ public class GameController {
                 break; 
             }
         } 
+    }
+
+// ----------------------------------------------------------------------------------
+
+    // Calls spawnEnemy() to create enemies at specific locations with patrol bounds!
+    // Basically, enemies get placed and know where to walk (limit their movement)
+    // Don't walk on water anymore/float
+    private void spawnEnemies() {
+    spawnEnemy(860, 940, 610, 1132); // X/Y + patrol min/max
+    spawnEnemy(1433, 940, 1132, 1880);
+    spawnEnemy(2730, 940, 2395, 3811);
+    spawnEnemy(4627, 940, 4333, 5450);
+    }
+    // Enemy also spawned with image, health bar, and label    
+    private void spawnEnemy(double x, double y, double patrolMinX, double patrolMaxX) {
+        ImageView newEnemy = new ImageView(new Image("/com/game/basicEnemy.png"));
+        newEnemy.setFitWidth(50);
+        newEnemy.setFitHeight(50);
+        newEnemy.setLayoutX(x);
+        newEnemy.setLayoutY(y);
+
+        Enemy stats = new Enemy();
+
+        Label hpLabel = new Label("Enemy HP: " + stats.currentHealth + "/" + stats.maxHealth);
+        hpLabel.setLayoutX(x);
+        hpLabel.setLayoutY(y - 30);
+
+        Rectangle hpBar = new Rectangle(50, 5, Color.RED); // red bar to pop out
+        hpBar.setX(x);
+        hpBar.setY(y - 15);
+
+        world.getChildren().addAll(newEnemy, hpLabel, hpBar); // shows on gui
+
+        enemies.add(newEnemy);
+        enemyStats.add(stats);
+        enemyHealthLabels.add(hpLabel);
+        enemyHealthBars.add(hpBar);
+        enemyPatrolBounds.add(new Double[]{patrolMinX, patrolMaxX}); // save patrol bounds
     }
 
 

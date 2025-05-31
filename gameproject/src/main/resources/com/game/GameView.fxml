@@ -23,10 +23,6 @@
             <!-- Water -->
             <Rectangle fx:id="water" layoutX="0" layoutY="1000" width="5361" height="80" fill="blue"/>
             
-            <!-- UI: Enemy Health Bar -->
-            <Label fx:id="enemyHealthLabel" layoutX="900" layoutY="30" text="Enemy HP: 10/10"/>
-            <Rectangle fx:id="enemyHealthBar" fill="DarkRed" width="50" height="12"/>
-            
             <!-- Floating Platforms -->
             <Rectangle fx:id="floatingPlatform" layoutX="300" layoutY="850" width="150" height="20" fill="green"/>
             <Rectangle fx:id="floatingPlatform2" layoutX="488" layoutY="750" width="150" height="20" fill="green"/>
@@ -46,9 +42,6 @@
 
             <!-- Wall Obstacle -->
             <Rectangle fx:id="wall" layoutX="5450" layoutY="371" width="135" height="609" fill="green"/>
-
-            <!-- Enemy Rectangle -->
-            <Rectangle fx:id="enemy" layoutX="150" layoutY="940" width="40" height="40" fill="red"/>
 
             <!-- Player -->
             <Rectangle fx:id="player" x="100" y="850" width="40" height="40" fill="blue"/>

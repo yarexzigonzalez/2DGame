@@ -23,7 +23,11 @@
         <Pane fx:id="world" prefWidth="6366" prefHeight="1080">
 
             <!-- Water -->
-            <Rectangle fx:id="water" layoutX="0" layoutY="1000" width="5361" height="80" fill="blue"/>
+            <ImageView fx:id="water" layoutX="0" layoutY="1000" fitWidth="5361" fitHeight="80" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/water.png"/>
+                </image>
+            </ImageView>
             
             <!-- Floating Platforms -->
             <ImageView fx:id="floatingPlatform" layoutX="300" layoutY="850" fitWidth="150" fitHeight="20" preserveRatio="false">

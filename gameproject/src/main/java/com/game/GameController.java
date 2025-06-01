@@ -52,7 +52,7 @@ public class GameController {
     floatingPlatform10, floatingPlatform11, floatingPlatform12, floatingPlatform13, floatingPlatform14,
     floatingPlatform15; 
     @FXML
-    private Rectangle water;
+    private ImageView water;
    
     // Cooldown stuff
     private long lastSpikeDamageTime = 0; // Last time spikes were checked

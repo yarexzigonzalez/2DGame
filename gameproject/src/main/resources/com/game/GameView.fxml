@@ -17,7 +17,11 @@
     <Group fx:id="gameView" layoutX="0" layoutY="0">
 
         <!-- Background -->
-        <Rectangle width="6361" height="1080" fill="lightblue"/>
+        <ImageView fitWidth="6361" fitHeight="1080" preserveRatio="false">
+            <image>
+                <Image url="@/com/game/background.png"/>
+            </image>
+        </ImageView>
 
         <!-- Game world pane (part that gon move) -->
         <Pane fx:id="world" prefWidth="6366" prefHeight="1080">

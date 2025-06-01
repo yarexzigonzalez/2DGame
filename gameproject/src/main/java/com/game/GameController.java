@@ -23,6 +23,12 @@ public class GameController {
     private Player playerStats = new Player(); // Create a new player object     
     @FXML
     private ImageView player; // Matches element type in FXML
+    private ImageView keyImage;
+    private boolean hasKey = false;
+    private ImageView doorImage;
+    private boolean doorOpened = false;
+    private ImageView babyImage;
+    private boolean babySpawned = false;
     @FXML
     private Button inventoryButton;
     @FXML
@@ -81,6 +87,15 @@ public class GameController {
         player.setFitWidth(50);
         player.setFitHeight(50);
 
+        // Door
+        doorImage = new ImageView(new Image("/com/game/door.png"));
+        doorImage.setFitWidth(60);
+        doorImage.setFitHeight(80);
+        doorImage.setLayoutX(7270); // replace with actual coords
+        doorImage.setLayoutY(900);
+        world.getChildren().add(doorImage);
+
+
         // Delay until everything good and loaded
         Platform.runLater(() -> {
             WorldWidth = world.getWidth(); // Get actual width of the world
@@ -105,6 +120,7 @@ public class GameController {
         Potion healthPotion = new HealthPotion("Health Potion", "/com/game/healthPotion.PNG", 10);
         Potion damagePotion = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG", 3, 5);
         Potion speedPotion = new SpeedPotion("Speed Potion", "/com/game/speedPotion.PNG", 2, 5);
+        // For testing (change later)
         Potion dPotion2 = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG",10, 10);
         double healthPotionX = wall.getLayoutX() + 50; 
         double healthPotionY = wall.getLayoutY() - 55;
@@ -148,6 +164,9 @@ public class GameController {
                 checkSpikeCollision(); 
                 moveEnemies();
                 checkPlayerEnemyCollisions();
+                checkKeyPickup();
+                checkDoorUnlock();
+                moveBaby();
            }
         };
         timer.start();
@@ -200,10 +219,14 @@ public class GameController {
                     enemyHealthLabels.get(i).setVisible(false); // Remove label
                     enemyHealthBars.get(i).setVisible(false);   // Remove health bar
                     System.out.println("Enemy " + i + " has died and disappeared.");
+                    // If this is boss
+                    if (isBossEnemy(i)) {
+                        spawnKey(enemy.getLayoutX(), enemy.getLayoutY());
+                    }
                 }
                 continue; // Dead enemies do nothing, skip rest for this enemy
             }
-    
+
             if (playerStats.isDead) continue;
     
             if (player.getBoundsInParent().intersects(enemy.getBoundsInParent())) {
@@ -216,6 +239,10 @@ public class GameController {
                 }
             }
         }
+    }
+
+    private boolean isBossEnemy(int index) {
+        return index == 4; // 5th enemy added
     }
 
 // ------------------------------------------------------------------------------------
@@ -465,6 +492,28 @@ public class GameController {
             potionImage.setLayoutY(potion.getSpawnY());
         }
 
+        // Reset key
+        if (keyImage != null) {
+            keyImage.setVisible(false);
+            keyImage.setLayoutX(-100); // Move offscreen
+            keyImage.setLayoutY(-100);
+        }
+        hasKey = false;
+
+        // Reset Door
+        if (doorImage != null) {
+            // Go back to closed door
+            doorImage.setImage(new Image("com/game/door.png"));
+        }
+        doorOpened = false;
+
+        // Reset baby
+        if (babyImage != null) {
+            world.getChildren().remove(babyImage);
+            babyImage = null;
+        }
+        babySpawned = false;
+
         // Reset health label
         updateHealthLabel();
 
@@ -648,5 +697,80 @@ public class GameController {
         enemyPatrolBounds.add(new Double[]{patrolMinX, patrolMaxX});
     }
 
+// -----------------------------------------------------------------------------------------------
+
+    private void spawnKey(double x, double y) {
+        // PRevent dupes just in case--if key already exists
+        if (keyImage != null && world.getChildren().contains(keyImage)) {
+            world.getChildren().remove(keyImage);
+        }
+
+        hasKey = false;
+
+        keyImage = new ImageView(new Image("/com/game/key.png"));
+        keyImage.setFitWidth(30);
+        keyImage.setFitHeight(30);
+        keyImage.setLayoutX(x);
+        keyImage.setLayoutY(y);
+        keyImage.setVisible(true);
+        keyImage.setOpacity(1.0);
+        keyImage.toFront();
+        world.getChildren().add(keyImage);
+        System.out.println("Key dropped at: " + x + ", " + y);
+        System.out.println("Key visibility: " + keyImage.isVisible());
+
+    }
+
+// ------------------------------------------------------------------------------------------------
+
+    private void checkKeyPickup() {
+        if (keyImage != null && keyImage.isVisible() && player.getBoundsInParent().intersects(keyImage.getBoundsInParent())) {
+            hasKey = true;
+            keyImage.setVisible(false);
+            System.out.println("Key picked up!");
+        }
+    }
+
+// ------------------------------------------------------------------------------------------------
+
+    private void checkDoorUnlock() {
+        if (hasKey && !doorOpened && player.getBoundsInParent().intersects(doorImage.getBoundsInParent())) {
+            doorImage.setImage(new Image("/com/game/openDoor.png"));
+            doorOpened = true;
+            spawnBaby(doorImage.getLayoutX(), doorImage.getLayoutY() + 40);
+            System.out.println("Door unlocked and baby spawned!");
+        }
+    }
+
+// ------------------------------------------------------------------------------------------------
+
+    private void spawnBaby(double x, double y) {
+        babyImage = new ImageView(new Image("/com/game/baby.png"));
+        babyImage.setFitWidth(40);
+        babyImage.setFitHeight(40);
+        babyImage.setLayoutX(x);
+        babyImage.setLayoutY(y);
+        world.getChildren().add(babyImage);
+        babySpawned = true;
+    }
+
+// ------------------------------------------------------------------------------------------------
+
+    private void moveBaby() {
+        if (!babySpawned || babyImage == null) return;
+
+        double babyX = babyImage.getLayoutX();
+        double playerX = player.getLayoutX();
+
+        double speed = 0.7; // make it cute and slow
+
+        if (Math.abs(playerX - babyX) > speed) {
+            if (playerX < babyX) {
+                babyImage.setLayoutX(babyX - speed);
+            } else {
+                babyImage.setLayoutX(babyX + speed);
+            }
+        }
+    }
 
 }

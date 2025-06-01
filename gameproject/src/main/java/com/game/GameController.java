@@ -102,21 +102,22 @@ public class GameController {
         );
 
         // Add potions dynamically
-        Potion healthPotion = new HealthPotion("Health Potion", "/com/game/healthPotion.PNG", 3);
+        Potion healthPotion = new HealthPotion("Health Potion", "/com/game/healthPotion.PNG", 10);
         Potion damagePotion = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG", 3, 5);
         Potion speedPotion = new SpeedPotion("Speed Potion", "/com/game/speedPotion.PNG", 2, 5);
-
+        Potion dPotion2 = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG",10, 10);
         double healthPotionX = wall.getLayoutX() + 50; 
         double healthPotionY = wall.getLayoutY() - 55;
         double speedPotionX = floatingPlatform8.getLayoutX() + 50; 
         double speedPotionY = floatingPlatform8.getLayoutY() - 55;
         double damagePotionX = floatingPlatform3.getLayoutX() + 50; 
         double damagePotionY = floatingPlatform3.getLayoutY() - 55;
-
+        double dPotion2X = groundPlatform4.getLayoutX() + 2000;
+        double dPotion2Y = groundPlatform4.getLayoutY() - 55;
         addPotionToWorld(healthPotion, healthPotionX, healthPotionY);
         addPotionToWorld(damagePotion, damagePotionX, damagePotionY);
         addPotionToWorld(speedPotion, speedPotionX, speedPotionY);
-
+        addPotionToWorld(dPotion2,dPotion2X, dPotion2Y);
         // Add spikes to the world
         // Far left 
         addSpikeToWorld("/com/game/onespike.png", floatingPlatform5.getLayoutX(), floatingPlatform5.getLayoutY() - 60);
@@ -298,13 +299,6 @@ public class GameController {
     }
 
 // --------------------------------------------------------------------------------
-   
-    /* Leave out for now
-    @FXML
-    private void openInventory() {
-        // Logic to open the inventory
-        System.out.println("Inventory opened, add GUI here."); 
-    }*/
 
     private void updateHealthLabel() {
         healthLabel.setText("Health: " + playerStats.currentHealth + "/" + playerStats.maxHealth);
@@ -597,6 +591,7 @@ public class GameController {
     spawnEnemy(1433, 940, 1132, 1670);
     spawnEnemy(2730, 940, 2395, 3811);
     spawnEnemy(4627, 940, 4333, 5400);
+    spawnBoss(5700, 900, 5605, 7270);
     }
     // Enemy also spawned with image, health bar, and label    
     private void spawnEnemy(double x, double y, double patrolMinX, double patrolMaxX) {
@@ -623,6 +618,34 @@ public class GameController {
         enemyHealthLabels.add(hpLabel);
         enemyHealthBars.add(hpBar);
         enemyPatrolBounds.add(new Double[]{patrolMinX, patrolMaxX}); // save patrol bounds
+    }
+
+// --------------------------------------------------------------------------------------------------
+
+    private void spawnBoss(double x, double y, double patrolMinX, double patrolMaxX) {
+        ImageView boss = new ImageView(new Image("/com/game/boss.png"));
+        boss.setFitWidth(100); // Bigger size!
+        boss.setFitHeight(100);
+        boss.setLayoutX(x);
+        boss.setLayoutY(y);
+
+        BossEnemy stats = new BossEnemy();
+
+        Label hpLabel = new Label("Boss HP: " + stats.currentHealth + "/" + stats.maxHealth);
+        hpLabel.setLayoutX(x);
+        hpLabel.setLayoutY(y - 30);
+
+        Rectangle hpBar = new Rectangle(100, 5, Color.DARKRED); // Longer bar
+        hpBar.setX(x);
+        hpBar.setY(y - 15);
+
+        world.getChildren().addAll(boss, hpLabel, hpBar);
+
+        enemies.add(boss);
+        enemyStats.add(stats);
+        enemyHealthLabels.add(hpLabel);
+        enemyHealthBars.add(hpBar);
+        enemyPatrolBounds.add(new Double[]{patrolMinX, patrolMaxX});
     }
 
 

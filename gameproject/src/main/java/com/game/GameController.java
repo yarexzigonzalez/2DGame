@@ -43,11 +43,11 @@ public class GameController {
     private final double maxFallSpeed = 15; // Maximum falling speed can adjust
     // (Ashley's suggestion)
     @FXML
-    private Rectangle groundPlatform, groundPlatform2, groundPlatform3, groundPlatform4;
+    private ImageView groundPlatform, groundPlatform2, groundPlatform3, groundPlatform4;
     @FXML
-    private Rectangle wall;
+    private ImageView wall;
     @FXML 
-    private Rectangle floatingPlatform, floatingPlatform2, floatingPlatform3, floatingPlatform4, 
+    private ImageView floatingPlatform, floatingPlatform2, floatingPlatform3, floatingPlatform4, 
     floatingPlatform5, floatingPlatform6, floatingPlatform7, floatingPlatform8, floatingPlatform9, 
     floatingPlatform10, floatingPlatform11, floatingPlatform12, floatingPlatform13, floatingPlatform14,
     floatingPlatform15; 
@@ -63,7 +63,7 @@ public class GameController {
     private List<Potion> activePotions = new ArrayList<>(); 
     private List<ImageView> potionImages = new ArrayList<>(); 
     private List<ImageView> spikeImages = new ArrayList<>();
-    private List<Rectangle> platforms; // List to hold all platforms
+    private List<ImageView> platforms; // List to hold all platforms
     private List<ImageView> enemies = new ArrayList<>();
     private List<Enemy> enemyStats = new ArrayList<>(); 
     private List<Label> enemyHealthLabels = new ArrayList<>();
@@ -80,7 +80,7 @@ public class GameController {
         player.setImage(playerImage);
         player.setFitWidth(50);
         player.setFitHeight(50);
-        
+
         // Delay until everything good and loaded
         Platform.runLater(() -> {
             WorldWidth = world.getWidth(); // Get actual width of the world
@@ -121,16 +121,16 @@ public class GameController {
         // Far left 
         addSpikeToWorld("/com/game/onespike.png", floatingPlatform5.getLayoutX(), floatingPlatform5.getLayoutY() - 60);
         // Far right 
-        addSpikeToWorld("/com/game/onespike.png", floatingPlatform5.getLayoutX() + floatingPlatform5.getWidth() - 50, floatingPlatform5.getLayoutY() - 60);
+        addSpikeToWorld("/com/game/onespike.png", floatingPlatform5.getLayoutX() + floatingPlatform5.getFitWidth() - 50, floatingPlatform5.getLayoutY() - 60);
         // Middle of ground platform
-        double middleGroundX = groundPlatform4.getLayoutX() + (groundPlatform.getWidth() / 2) - 40;
+        double middleGroundX = groundPlatform4.getLayoutX() + (groundPlatform.getFitWidth() / 2) - 40;
         addSpikeToWorld("/com/game/spikes.png", middleGroundX, groundPlatform.getLayoutY() - 45);
         // Floating platform 7
         addSpikeToWorld("/com/game/onespike.png", floatingPlatform7.getLayoutX() + 20, floatingPlatform7.getLayoutY() - 60);
         // Edge of floatingPlatform12
         addSpikeToWorld("/com/game/onespike.png", floatingPlatform12.getLayoutX(), floatingPlatform12.getLayoutY() - 60);
         // Edge of floatingPlatform11
-        addSpikeToWorld("/com/game/onespike.png", floatingPlatform11.getLayoutX() + floatingPlatform11.getWidth() - 50, floatingPlatform11.getLayoutY() - 60);
+        addSpikeToWorld("/com/game/onespike.png", floatingPlatform11.getLayoutX() + floatingPlatform11.getFitWidth() - 50, floatingPlatform11.getLayoutY() - 60);
 
         // Set enemy image
         spawnEnemies();
@@ -233,7 +233,7 @@ public class GameController {
         Bounds playerBounds = player.getBoundsInParent();
 
         // Loop through all platforms to check for collision
-        for (Rectangle platform : platforms) {
+        for (ImageView platform : platforms) {
             Bounds platformBounds = platform.getBoundsInParent();
             boolean horizontal = playerBounds.getMaxX() > platformBounds.getMinX() &&
                                  playerBounds.getMinX() < platformBounds.getMaxX();
@@ -532,7 +532,7 @@ public class GameController {
 
         // Loops through all platforms to check for side (left/right) collisions 
         // — works for walls
-        for (Rectangle platform : platforms) {
+        for (ImageView platform : platforms) {
             Bounds platformBounds = platform.getBoundsInParent();
 
             // Predict horizontal position
@@ -594,7 +594,7 @@ public class GameController {
     // Don't walk on water anymore/float
     private void spawnEnemies() {
     spawnEnemy(860, 940, 610, 1132); // X/Y + patrol min/max
-    spawnEnemy(1433, 940, 1132, 1880);
+    spawnEnemy(1433, 940, 1132, 1670);
     spawnEnemy(2730, 940, 2395, 3811);
     spawnEnemy(4627, 940, 4333, 5400);
     }

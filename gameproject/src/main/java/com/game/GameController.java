@@ -22,7 +22,7 @@ import javafx.util.Duration;
 public class GameController {
     private Player playerStats = new Player(); // Create a new player object     
     @FXML
-    private Rectangle player; // Matches element type in FXML
+    private ImageView player; // Matches element type in FXML
     @FXML
     private Button inventoryButton;
     @FXML
@@ -65,16 +65,22 @@ public class GameController {
     private List<ImageView> spikeImages = new ArrayList<>();
     private List<Rectangle> platforms; // List to hold all platforms
     private List<ImageView> enemies = new ArrayList<>();
-    List<Enemy> enemyStats = new ArrayList<>(); 
-    List<Label> enemyHealthLabels = new ArrayList<>();
-    List<Rectangle> enemyHealthBars = new ArrayList<>();
+    private List<Enemy> enemyStats = new ArrayList<>(); 
+    private List<Label> enemyHealthLabels = new ArrayList<>();
+    private List<Rectangle> enemyHealthBars = new ArrayList<>();
     // Holds patrol x boundaries for each enemy to prevent them from chasing forever
     // aka from floating over water like before....
-    List<Double[]> enemyPatrolBounds = new ArrayList<>(); 
+    private List<Double[]> enemyPatrolBounds = new ArrayList<>(); 
 // ------------------------------------------------------------------------------------
 
     @FXML
     public void initialize() {
+        // Player
+        Image playerImage = new Image(getClass().getResourceAsStream("/com/game/player.PNG"));
+        player.setImage(playerImage);
+        player.setFitWidth(50);
+        player.setFitHeight(50);
+        
         // Delay until everything good and loaded
         Platform.runLater(() -> {
             WorldWidth = world.getWidth(); // Get actual width of the world
@@ -156,7 +162,7 @@ public class GameController {
     
             if (stats.isDead) continue;
     
-            double playerX = player.getX();
+            double playerX = player.getLayoutX();
             double enemyX = enemy.getLayoutX();
             double speed = stats.moveSpeed;
     
@@ -219,9 +225,10 @@ public class GameController {
     places player to platform or ground if collision occurs
     (used Bounds (geometry rectangles) to make more accurate collision checks)
     */
-    private void applyGravity() {
+    // FOR IMAGEVIEW USE getLayoutX/Y() for position and setLayoutX/Y() to move it
+   private void applyGravity() {
         // Calculate where player will move next vertically (Y position)
-        double nextY = player.getY() + velocityY;
+        double nextY = player.getLayoutY() + velocityY;
         // Get bounds for next frame
         Bounds playerBounds = player.getBoundsInParent();
 
@@ -238,7 +245,7 @@ public class GameController {
                                nextBottom >= platformBounds.getMinY();
             if (horizontal && vertical) {
                 // Collision detected! Move player to stand on platform
-                player.setY(platformBounds.getMinY() - player.getHeight());
+                player.setLayoutY(platformBounds.getMinY() - player.getBoundsInParent().getHeight());
                 velocityY = 0; // Stop vertical movement
                 jumping = false; // Reset jumping so player can jump again
                 return; // Exit the loop after collision
@@ -249,21 +256,21 @@ public class GameController {
             if (velocityY > maxFallSpeed) {
                 velocityY = maxFallSpeed; // Cap fall speed
             }
-            player.setY(nextY); // Update player Y position
+            player.setLayoutY(nextY); // Update player Y position
     }
     
 // ---------------------------------------------------------------------------
 
     @FXML 
     public void onKeyPressed(KeyEvent event) {
-        double currentX = player.getX();
+        double currentX = player.getLayoutX();
         double moveAmount = playerStats.moveSpeed; // Amount to move left/right
         // Updated options to use left/right arrow keys or A/D keys
         switch (event.getCode()) {
             case LEFT:
             case A:
                 if (!isCollidingHorizontally(currentX - moveAmount)) {
-                    player.setX(currentX - moveAmount);
+                    player.setLayoutX(currentX - moveAmount);
                     updateCamera(); // Update camera position
                     playerStats.setFacingRight(false); 
                 }
@@ -271,7 +278,7 @@ public class GameController {
             case RIGHT:
             case D:
                 if (!isCollidingHorizontally(currentX + moveAmount)) {
-                    player.setX(currentX + moveAmount);
+                    player.setLayoutX(currentX + moveAmount);
                     updateCamera(); // Update camera position
                     playerStats.setFacingRight(true); 
                 }
@@ -325,7 +332,7 @@ public class GameController {
             return; // If world width is not set yet, do nothing
         }
         // Get the player's X position and center the camera on them
-        double playerX = player.getX() + player.getWidth() / 2;
+        double playerX = player.getLayoutX() + player.getBoundsInParent().getWidth() / 2;
         // How far to move the camera left/right to center player
         double cameraX = playerX - (ViewWidth / 2);
         
@@ -424,8 +431,8 @@ public class GameController {
         double startingY = 850; // Starting Y position of player
     
         // Reset player
-        player.setX(startingX);
-        player.setY(startingY);
+        player.setLayoutX(startingX);
+        player.setLayoutY(startingY);
         playerStats.isDead = false;
         velocityY = 0; 
         playerStats.currentHealth = playerStats.maxHealth; 
@@ -529,8 +536,8 @@ public class GameController {
             Bounds platformBounds = platform.getBoundsInParent();
 
             // Predict horizontal position
-            double predictedMinX = futureBounds.getMinX() + (nextX - player.getX());
-            double predictedMaxX = futureBounds.getMaxX() + (nextX - player.getX());
+            double predictedMinX = futureBounds.getMinX() + (nextX - player.getLayoutX());
+            double predictedMaxX = futureBounds.getMaxX() + (nextX - player.getLayoutX());
             // Check if player and wall are on same vertical level
             boolean verticalOverlap = futureBounds.getMaxY() > platformBounds.getMinY() &&
                                     futureBounds.getMinY() < platformBounds.getMaxY();
@@ -589,7 +596,7 @@ public class GameController {
     spawnEnemy(860, 940, 610, 1132); // X/Y + patrol min/max
     spawnEnemy(1433, 940, 1132, 1880);
     spawnEnemy(2730, 940, 2395, 3811);
-    spawnEnemy(4627, 940, 4333, 5450);
+    spawnEnemy(4627, 940, 4333, 5400);
     }
     // Enemy also spawned with image, health bar, and label    
     private void spawnEnemy(double x, double y, double patrolMinX, double patrolMaxX) {

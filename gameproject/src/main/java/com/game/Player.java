@@ -4,8 +4,8 @@ public class Player extends Character{
     public int attackDelay;
 
     public Player(){
-        this.currentHealth = 10;
-        this.maxHealth = 10;
+        this.currentHealth = 15;
+        this.maxHealth = 15;
         this.moveSpeed = 20;
         this.power = 1;
         this.isDead = false;

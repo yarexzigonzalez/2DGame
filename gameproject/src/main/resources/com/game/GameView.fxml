@@ -5,6 +5,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.Group?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.game.GameController"
@@ -44,7 +46,7 @@
             <Rectangle fx:id="wall" layoutX="5450" layoutY="371" width="135" height="609" fill="green"/>
 
             <!-- Player -->
-            <Rectangle fx:id="player" x="100" y="850" width="40" height="40" fill="blue"/>
+            <ImageView fx:id="player" layoutX="100" layoutY="850"/>
 
             <!-- Ground Platforms -->
             <Rectangle fx:id="groundPlatform" layoutX="-115" layoutY="980" width="490" height="100" fill="darkgreen"/>

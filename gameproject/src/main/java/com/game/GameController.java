@@ -5,11 +5,15 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import java.util.ArrayList;
@@ -77,10 +81,19 @@ public class GameController {
     // Holds patrol x boundaries for each enemy to prevent them from chasing forever
     // aka from floating over water like before....
     private List<Double[]> enemyPatrolBounds = new ArrayList<>(); 
+
+    private long startTime;
+    private long endTime;
+    private long timeTaken; // milliseconds
+
+    private boolean deathHandled = false;
 // ------------------------------------------------------------------------------------
 
     @FXML
     public void initialize() {
+        // Game start
+        startTime = System.currentTimeMillis();
+
         // Player
         Image playerImage = new Image(getClass().getResourceAsStream("/com/game/player.PNG"));
         player.setImage(playerImage);
@@ -208,6 +221,8 @@ public class GameController {
 // ------------------------------------------------------------------------------------
 
     private void checkPlayerEnemyCollisions() {
+        if (deathHandled) return;
+
         for (int i = 0; i < enemies.size(); i++) {
             ImageView enemy = enemies.get(i);
             Enemy stats = enemyStats.get(i);
@@ -234,7 +249,15 @@ public class GameController {
                     playerStats.damaged(stats.power);
                     stats.attackedPlayer(); // enemy attack cooldown
                     updateHealthLabel();
-                    if (playerStats.isDead) restartGame();
+                    if (playerStats.isDead) {
+                        deathHandled = true; // To prevent repeat
+                        if (!babySpawned) {
+                            showDeathScreen(); // Died before completing level
+                        } else {
+                            restartGame(); // Completed level
+                        }
+                    }
+                    
                     System.out.println("Enemy " + i + " hit player! Player HP: " + playerStats.currentHealth);
                 }
             }
@@ -432,13 +455,21 @@ public class GameController {
 // --------------------------------------------------------------------------------
 
     private void checkWaterCollision() {
+        if (deathHandled) return;
+
         if (player.getBoundsInParent().intersects(water.getBoundsInParent())) {
             if (!playerStats.isDead) {
                 playerStats.isDead = true;
                 System.out.println("Player drowned in water! Game over!");
-                restartGame();
+                if (!deathHandled) {
+                    deathHandled = true;
+                    if (!babySpawned) {
+                        showDeathScreen(); // Died before completing level
+                    } else {
+                        restartGame(); // Completed level
+                    }
+                }
             }
-            
         }
     }
 
@@ -446,6 +477,8 @@ public class GameController {
 
     private void restartGame() {
         System.out.println("Restarting game...");
+
+        deathHandled = false;
 
         // Player x and y positions
         double startingX = 100; // Starting X position of player
@@ -520,10 +553,12 @@ public class GameController {
         // Reset camera position
         world.setLayoutX(0); // Reset camera to start position
 
+        AnchorPane rootPane = (AnchorPane) gameView.getParent();
+        rootPane.requestFocus(); // So keyboard focus is brought back
+        // Makes key events work again
+
         // Reset tiner 
-        // Maybe add timer to game to track time played or something (later)
-        //startTime = System.nanoTime();
-        //gameTimer.start();
+        startTime = System.currentTimeMillis();
     }
 
 // --------------------------------------------------------------------------------
@@ -606,9 +641,11 @@ public class GameController {
         spikeImages.add(spike);
     }
 // --------------------------------------------------------------------------------
-    
+
     private void checkSpikeCollision() {
         long now = System.nanoTime();
+        if (deathHandled) return; // No double death
+
         if (now - lastSpikeDamageTime < spikeDamageCooldown) {
             return; // skip, still in cooldown
         }
@@ -617,14 +654,20 @@ public class GameController {
                 System.out.println("OUCH! Player hit spikes!");
                 playerStats.damaged(1); // Assuming spikes deal 1 damage
                 updateHealthLabel();
+
+                lastSpikeDamageTime = now; // Update cooldown timer
+
                 if (playerStats.isDead) {
                     System.out.println("Player is dead from spikes!");
-                    restartGame(); 
+                    deathHandled = true; // Needed to add to stop repeeat death 
+                    if (!babySpawned) {
+                        showDeathScreen(); // Died before completing level
+                    } else {
+                        restartGame(); // Completed level
+                    }
                 } else {
                     System.out.println("Player health is now: " + playerStats.getCurrentHealth());
                 }
-
-                lastSpikeDamageTime = now; // Update last damage time
                 break; 
             }
         } 
@@ -752,6 +795,28 @@ public class GameController {
         babyImage.setLayoutY(y);
         world.getChildren().add(babyImage);
         babySpawned = true;
+
+        // Stop timer cus game level complete
+        endTime = System.currentTimeMillis();
+        timeTaken = endTime - startTime; // in milliseconds
+
+        // Show "BABY RESCUED!" label at the top center of the screen
+        Label rescuedLabel = new Label("BABY RESCUED!");
+        rescuedLabel.setStyle("-fx-font-size: 36px; -fx-text-fill: white;");
+        rescuedLabel.setLayoutX(6282); 
+        rescuedLabel.setLayoutY(424);  
+        world.getChildren().add(rescuedLabel);
+
+        // Wait 7 seconds then show end screen
+        PauseTransition delay = new PauseTransition(Duration.seconds(7));
+        // Using lambda shorthand to handle what happens when timer done
+        // cleaner way to handle events basically
+        delay.setOnFinished(e -> {
+            world.getChildren().remove(rescuedLabel); 
+            showLevelCompleteScreen(); 
+        });
+        delay.play();
+
     }
 
 // ------------------------------------------------------------------------------------------------
@@ -771,6 +836,99 @@ public class GameController {
                 babyImage.setLayoutX(babyX + speed);
             }
         }
+    }
+
+// ------------------------------------------------------------------------------------------------
+
+    private void showLevelCompleteScreen() {
+        AnchorPane rootPane = (AnchorPane) gameView.getParent();
+
+        // Menu VBox
+        VBox menu = new VBox(20);
+        menu.setAlignment(Pos.CENTER);
+        menu.setStyle("-fx-background-color: transparent;");
+
+        Label completeLabel = new Label("Level 1 Complete!");
+        completeLabel.setStyle("-fx-font-size: 32px; -fx-text-fill: white;");
+
+        long seconds = timeTaken / 1000;
+        long minutes = seconds / 60;
+        long remainingSeconds = seconds % 60;
+
+        Label timeLabel = new Label(String.format("Time: %02d:%02d", minutes, remainingSeconds));
+        timeLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
+
+        Button playAgainBtn = new Button("Play Again");
+        Button exitBtn = new Button("Exit");
+
+        StackPane overlay = new StackPane(menu);
+        overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.85);");
+
+        // Handles "Play Again" button clicked using lambda syntax 
+        playAgainBtn.setOnAction(e -> {
+            rootPane.getChildren().remove(overlay); // remove whole overlay
+            restartGame();
+        });
+        // Handles "Exit" button click using lambda syntax
+        exitBtn.setOnAction(e -> {
+            Platform.exit();
+        });
+
+        menu.getChildren().addAll(completeLabel, timeLabel, playAgainBtn, exitBtn);
+
+        rootPane.getChildren().add(overlay);
+        overlay.toFront(); 
+    }
+
+// -------------------------------------------------------------------------------------------------------
+    
+    // Pretty much same thing as showLevelCompleteScreen() but for player death
+    private void showDeathScreen() {
+        AnchorPane rootPane = (AnchorPane) gameView.getParent();
+
+        // Pause for "dramatic effect" (1 second)
+        PauseTransition delay = new PauseTransition(Duration.seconds(1));
+        delay.setOnFinished(event -> {
+            VBox menu = new VBox(20);
+            menu.setAlignment(Pos.CENTER);
+            menu.setStyle("-fx-background-color: transparent;");
+
+            Label deathLabel = new Label("YOU DIED");
+            deathLabel.setStyle("-fx-font-size: 48px; -fx-text-fill: red; -fx-font-weight: bold;");
+
+            // Time survived
+            long timeTaken = System.currentTimeMillis() - startTime;
+            long seconds = timeTaken / 1000;
+            long minutes = seconds / 60;
+            long remainingSeconds = seconds % 60;
+
+            Label timeLabel = new Label(String.format("You Lasted: %02d:%02d", minutes, remainingSeconds));
+            timeLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
+
+            Button tryAgainBtn = new Button("Try Again");
+            Button exitBtn = new Button("Exit");
+
+            StackPane overlay = new StackPane(menu);
+            overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
+            overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.85);");
+
+            tryAgainBtn.setOnAction(e -> {
+                rootPane.getChildren().remove(overlay); // Remove overlay
+                restartGame();
+            });
+
+            exitBtn.setOnAction(e -> {
+                Platform.exit();
+            });
+
+            menu.getChildren().addAll(deathLabel, timeLabel, tryAgainBtn, exitBtn);
+
+            rootPane.getChildren().add(overlay);
+            overlay.toFront();
+
+        });
+        delay.play();
     }
 
 }

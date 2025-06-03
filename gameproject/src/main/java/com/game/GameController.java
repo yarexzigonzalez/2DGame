@@ -92,12 +92,20 @@ public class GameController {
     private boolean deathHandled = false;
     private boolean canAttack = true;
     private final int attackCooldownMillis = 500;
+    private boolean keyDropped = false;
+    private boolean gamePaused = true; // Game starts paused
+    private boolean introShown = false;
 // ------------------------------------------------------------------------------------
 
     @FXML
     public void initialize() {
+        if (!introShown) {
+            showIntroScreen();
+            introShown = true;
+        }
+        
         // Game start
-        startTime = System.currentTimeMillis();
+        //startTime = System.currentTimeMillis();
 
         // Player
         Image playerImage = new Image(getClass().getResourceAsStream("/com/game/player.PNG"));
@@ -119,6 +127,8 @@ public class GameController {
             WorldWidth = world.getWidth(); // Get actual width of the world
             System.out.println("World width: " + WorldWidth);
         });
+        System.out.println("Key image URL: " + getClass().getResource("/com/game/key.png"));
+
         updateHealthLabel();
         // Hide labels initially
         healLabel.setVisible(false); 
@@ -182,6 +192,7 @@ public class GameController {
         AnimationTimer timer = new AnimationTimer() {
            @Override
            public void handle(long now) {
+                if (gamePaused) return;
                 applyGravity();
                 /*  Every frame, runs applyGravity which check for 
                 collisions and update player position */
@@ -247,10 +258,12 @@ public class GameController {
                     enemyHealthLabels.get(i).setVisible(false); // Remove label
                     enemyHealthBars.get(i).setVisible(false);   // Remove health bar
                     System.out.println("Enemy " + i + " has died and disappeared.");
-                    // If this is boss
-                    if (isBossEnemy(i)) {
-                        spawnKey(enemy.getLayoutX(), enemy.getLayoutY());
-                    }
+                }
+                // If this is boss
+                if (isBossEnemy(i) && !keyDropped) {
+                    spawnKey(enemy.getLayoutX(), enemy.getLayoutY() - 80); 
+                    // - (number) so it spawns "above" invisible enemy and not get hidden
+                    keyDropped = true;
                 }
                 continue; // Dead enemies do nothing, skip rest for this enemy
             }
@@ -899,14 +912,24 @@ public class GameController {
         menu.setStyle("-fx-background-color: transparent;");
 
         Label completeLabel = new Label("Level 1 Complete!");
-        completeLabel.setStyle("-fx-font-size: 32px; -fx-text-fill: white;");
+        //completeLabel.setStyle("-fx-font-size: 32px; -fx-text-fill: white;");
+        completeLabel.setStyle(
+            "-fx-font-size: 36px; " +
+            "-fx-font-family: 'Impact'; " +
+            "-fx-text-fill: white;"
+        );
 
         long seconds = timeTaken / 1000;
         long minutes = seconds / 60;
         long remainingSeconds = seconds % 60;
 
         Label timeLabel = new Label(String.format("Time: %02d:%02d", minutes, remainingSeconds));
-        timeLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
+        //timeLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
+        timeLabel.setStyle(
+            "-fx-font-size: 20px; " +
+            "-fx-font-family: 'Verdana'; " +
+            "-fx-font-weight: bold; " +
+            "-fx-text-fill: white;");
 
         Button playAgainBtn = new Button("Play Again");
         Button exitBtn = new Button("Exit");
@@ -937,48 +960,96 @@ public class GameController {
     private void showDeathScreen() {
         AnchorPane rootPane = (AnchorPane) gameView.getParent();
 
-        // Pause for "dramatic effect" (1 second)
-        PauseTransition delay = new PauseTransition(Duration.seconds(.5));
-        delay.setOnFinished(event -> {
-            VBox menu = new VBox(20);
-            menu.setAlignment(Pos.CENTER);
-            menu.setStyle("-fx-background-color: transparent;");
+        VBox menu = new VBox(20);
+        menu.setAlignment(Pos.CENTER);
+        menu.setStyle("-fx-background-color: transparent;");
 
-            Label deathLabel = new Label("YOU DIED");
-            deathLabel.setStyle("-fx-font-size: 48px; -fx-text-fill: red; -fx-font-weight: bold;");
+        Label deathLabel = new Label("YOU DIED");
+        deathLabel.setStyle("-fx-font-size: 48px; -fx-text-fill: red; -fx-font-weight: bold;");
 
-            // Time survived
-            long timeTaken = System.currentTimeMillis() - startTime;
-            long seconds = timeTaken / 1000;
-            long minutes = seconds / 60;
-            long remainingSeconds = seconds % 60;
+        // Time survived
+        long timeTaken = System.currentTimeMillis() - startTime;
+        long seconds = timeTaken / 1000;
+        long minutes = seconds / 60;
+        long remainingSeconds = seconds % 60;
 
-            Label timeLabel = new Label(String.format("You Lasted: %02d:%02d", minutes, remainingSeconds));
-            timeLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
+        Label timeLabel = new Label(String.format("You Lasted: %02d:%02d", minutes, remainingSeconds));
+        timeLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
 
-            Button tryAgainBtn = new Button("Try Again");
-            Button exitBtn = new Button("Exit");
+        Button tryAgainBtn = new Button("Try Again");
+        Button exitBtn = new Button("Exit");
 
-            StackPane overlay = new StackPane(menu);
-            overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
-            overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.85);");
+        StackPane overlay = new StackPane(menu);
+        overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.85);");
 
-            tryAgainBtn.setOnAction(e -> {
-                rootPane.getChildren().remove(overlay); // Remove overlay
-                restartGame();
-            });
-
-            exitBtn.setOnAction(e -> {
-                Platform.exit();
-            });
-
-            menu.getChildren().addAll(deathLabel, timeLabel, tryAgainBtn, exitBtn);
-
-            rootPane.getChildren().add(overlay);
-            overlay.toFront();
-
+        tryAgainBtn.setOnAction(e -> {
+            rootPane.getChildren().remove(overlay); // Remove overlay
+            restartGame();
         });
-        delay.play();
+
+        exitBtn.setOnAction(e -> {
+            Platform.exit();
+        });
+
+        menu.getChildren().addAll(deathLabel, timeLabel, tryAgainBtn, exitBtn);
+
+        rootPane.getChildren().add(overlay);
+        overlay.toFront();
     }
+// ---------------------------------------------------------------------------------------------------------------
+
+    // Pretty same thing again as other screen but only show up at very start 
+    private void showIntroScreen() {
+        AnchorPane rootPane = (AnchorPane) gameView.getParent();
+
+        VBox menu = new VBox(20);
+        menu.setAlignment(Pos.CENTER);
+        menu.setStyle("-fx-background-color: transparent;");
+
+        Label title = new Label("Level 1: Rescue the Baby");
+        title.setStyle(
+            "-fx-font-size: 36px; " +
+            "-fx-font-family: 'Impact'; " +
+            "-fx-text-fill: white;"
+        );
+        
+        Label objective = new Label("Objective:\n- Defeat all enemies\n- Kill the boss to acquire the key\n- Unlock the door to save the baby!");
+        objective.setStyle(
+            "-fx-font-size: 28px; " +
+            "-fx-font-family: 'Verdana'; " +
+            "-fx-text-fill: white;"
+        );
+        objective.setWrapText(true);
+        
+        Label controls = new Label("Controls: A/D or Arrows to move | F to attack");
+        controls.setStyle(
+            "-fx-font-size: 20px; " +
+            "-fx-font-family: 'Verdana'; " +
+            "-fx-font-weight: bold; " +
+            "-fx-text-fill: white;"
+        );
+        
+
+
+        Button startBtn = new Button("Start Game");
+
+        StackPane overlay = new StackPane(menu);
+        overlay.prefWidthProperty().bind(rootPane.widthProperty());
+        overlay.prefHeightProperty().bind(rootPane.heightProperty());
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.85);");
+
+        startBtn.setOnAction(e -> {
+            rootPane.getChildren().remove(overlay);
+            rootPane.requestFocus();
+            gamePaused = false; // Unpause game loop
+            startTime = System.currentTimeMillis(); // Start the game timer now
+        });
+
+        menu.getChildren().addAll(title, objective, controls, startBtn);
+        rootPane.getChildren().add(overlay);
+        overlay.toFront();
+    }
+
 
 }

@@ -5,7 +5,7 @@ public class Enemy extends Character {
     private long damageCooldown = 2000; // Cooldown time in milliseconds (2 sec)
 
     public Enemy() {
-        this.maxHealth = 15;
+        this.maxHealth = 10;
         this.currentHealth = maxHealth;
         this.power = 1;
         this.moveSpeed = .7;

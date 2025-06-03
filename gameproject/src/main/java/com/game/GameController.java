@@ -95,6 +95,8 @@ public class GameController {
     private boolean keyDropped = false;
     private boolean gamePaused = true; // Game starts paused
     private boolean introShown = false;
+    private boolean restartPromptShown = false;
+
 // ------------------------------------------------------------------------------------
 
     @FXML
@@ -103,9 +105,6 @@ public class GameController {
             showIntroScreen();
             introShown = true;
         }
-        
-        // Game start
-        //startTime = System.currentTimeMillis();
 
         // Player
         Image playerImage = new Image(getClass().getResourceAsStream("/com/game/player.PNG"));
@@ -127,7 +126,6 @@ public class GameController {
             WorldWidth = world.getWidth(); // Get actual width of the world
             System.out.println("World width: " + WorldWidth);
         });
-        System.out.println("Key image URL: " + getClass().getResource("/com/game/key.png"));
 
         updateHealthLabel();
         // Hide labels initially
@@ -259,11 +257,15 @@ public class GameController {
                     enemyHealthBars.get(i).setVisible(false);   // Remove health bar
                     System.out.println("Enemy " + i + " has died and disappeared.");
                 }
-                // If this is boss
-                if (isBossEnemy(i) && !keyDropped) {
+                // If this is boss (only spawn key is boss dead and all others are too)
+                if (isBossEnemy(i) && !keyDropped && areAllBasicEnemiesDead()) {
                     spawnKey(enemy.getLayoutX(), enemy.getLayoutY() - 80); 
                     // - (number) so it spawns "above" invisible enemy and not get hidden
                     keyDropped = true;
+                } else if (isBossEnemy(i) && !keyDropped && !areAllBasicEnemiesDead() && !restartPromptShown) {
+                    // Boss is dead but some enemies are still alive — show message
+                    showRestartPrompt();
+                    restartPromptShown = true; // so it doesn't repeat ocer and over
                 }
                 continue; // Dead enemies do nothing, skip rest for this enemy
             }
@@ -865,7 +867,10 @@ public class GameController {
 
         // Show "BABY RESCUED!" label at the top center of the screen
         Label rescuedLabel = new Label("BABY RESCUED!");
-        rescuedLabel.setStyle("-fx-font-size: 36px; -fx-text-fill: white;");
+        rescuedLabel.setStyle(
+        "-fx-font-size: 36px; " +
+        "-fx-font-family: 'Impact'; " +
+        "-fx-text-fill: white;");
         rescuedLabel.setLayoutX(6282); 
         rescuedLabel.setLayoutY(424);  
         world.getChildren().add(rescuedLabel);
@@ -912,7 +917,6 @@ public class GameController {
         menu.setStyle("-fx-background-color: transparent;");
 
         Label completeLabel = new Label("Level 1 Complete!");
-        //completeLabel.setStyle("-fx-font-size: 32px; -fx-text-fill: white;");
         completeLabel.setStyle(
             "-fx-font-size: 36px; " +
             "-fx-font-family: 'Impact'; " +
@@ -924,7 +928,6 @@ public class GameController {
         long remainingSeconds = seconds % 60;
 
         Label timeLabel = new Label(String.format("Time: %02d:%02d", minutes, remainingSeconds));
-        //timeLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
         timeLabel.setStyle(
             "-fx-font-size: 20px; " +
             "-fx-font-family: 'Verdana'; " +
@@ -1014,7 +1017,7 @@ public class GameController {
             "-fx-text-fill: white;"
         );
         
-        Label objective = new Label("Objective:\n- Defeat all enemies\n- Kill the boss to acquire the key\n- Unlock the door to save the baby!");
+        Label objective = new Label("Objective:\n- Defeat ALL enemies\n- Kill the boss to acquire the key\n- Unlock the door to save the baby!");
         objective.setStyle(
             "-fx-font-size: 28px; " +
             "-fx-font-family: 'Verdana'; " +
@@ -1051,5 +1054,51 @@ public class GameController {
         overlay.toFront();
     }
 
+// ---------------------------------------------------------------------------------------------------
+
+    private boolean areAllBasicEnemiesDead() {
+        for (int i = 0; i < enemies.size(); i++) {
+            if (!isBossEnemy(i)) { // ignore boss since not basic enemy
+                if (!enemyStats.get(i).isDead) {
+                    return false; // found a regular enemy still alive, so not true
+                }
+            }
+        }
+        return true; // all basic enemies are dead
+    }
+// ---------------------------------------------------------------------------------------------------
+
+    // another screen message pop up but only pops up if player forgets to kill all enemies
+    private void showRestartPrompt() {
+        AnchorPane rootPane = (AnchorPane) gameView.getParent();
+
+        VBox messageBox = new VBox(20);
+        messageBox.setAlignment(Pos.CENTER);
+        messageBox.setStyle("-fx-background-color: transparent;");
+
+        Label warning = new Label("You must defeat ALL enemies before facing the boss!");
+        warning.setStyle(
+            "-fx-font-size: 36px; " +
+            "-fx-font-family: 'Impact'; " +
+            "-fx-text-fill: white;");
+
+        Button tryAgain = new Button("Try Again");
+        Button exit = new Button("Exit");
+
+        StackPane overlay = new StackPane(messageBox);
+        overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.85);");
+
+        tryAgain.setOnAction(e -> {
+            rootPane.getChildren().remove(overlay);
+            restartGame();
+        });
+        
+        exit.setOnAction(e -> Platform.exit());
+
+        messageBox.getChildren().addAll(warning, tryAgain, exit);
+        rootPane.getChildren().add(overlay);
+        overlay.toFront();
+    }
 
 }

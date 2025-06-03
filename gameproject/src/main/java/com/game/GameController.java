@@ -52,7 +52,7 @@ public class GameController {
     private final double gravity = 0.5; // Gravity strength can adjust
     private final double jumpStrength = -15; // (suggested by ashley)
     private final double maxFallSpeed = 3; //(better for jumping "over" spikes)
-  
+
     @FXML
     private ImageView groundPlatform, groundPlatform2, groundPlatform3, groundPlatform4;
     @FXML
@@ -140,21 +140,18 @@ public class GameController {
         // Add potions dynamically
         Potion healthPotion = new HealthPotion("Health Potion", "/com/game/healthPotion.PNG", 10);
         Potion damagePotion = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG", 3, 5);
-        Potion speedPotion = new SpeedPotion("Speed Potion", "/com/game/speedPotion.PNG", 2, 5);
-        // For testing (change later)
-        Potion dPotion2 = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG",10, 10);
-        double healthPotionX = wall4.getLayoutX() + 50; 
-        double healthPotionY = wall4.getLayoutY() - 55;
-        double speedPotionX = floatingPlatform8.getLayoutX() + 50; 
-        double speedPotionY = floatingPlatform8.getLayoutY() - 55;
-        double damagePotionX = floatingPlatform3.getLayoutX() + 50; 
-        double damagePotionY = floatingPlatform3.getLayoutY() - 55;
-        double dPotion2X = groundPlatform4.getLayoutX() + 2000;
-        double dPotion2Y = groundPlatform4.getLayoutY() - 55;
-        addPotionToWorld(healthPotion, healthPotionX, healthPotionY);
-        addPotionToWorld(damagePotion, damagePotionX, damagePotionY);
-        addPotionToWorld(speedPotion, speedPotionX, speedPotionY);
-        addPotionToWorld(dPotion2,dPotion2X, dPotion2Y);
+        Potion speedPotion = new SpeedPotion("Speed Potion", "/com/game/speedPotion.PNG", 3, 5);
+     
+        // Near boss
+        Potion dPotion2 = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG",12, 10);
+        Potion hP2 = new HealthPotion("Health Potion", "/com/game/healthPotion.PNG", 15);
+        addPotionToWorld(healthPotion, 1730, 528);
+        addPotionToWorld(damagePotion, 685, 952);
+        addPotionToWorld(speedPotion, 2988, 490);
+        addPotionToWorld(dPotion2,5945, 949);
+        addPotionToWorld(hP2, 5524, 81);
+   
+       
         // Add spikes to the world (x-23, y-31) L to R across game screen
         addSpikeToWorld("/com/game/onespike.png", 1685, 743); // far left
         addSpikeToWorld("/com/game/onespike.png", 2030,743 ); // far right
@@ -166,7 +163,17 @@ public class GameController {
         addSpikeToWorld("/com/game/onespike.png", 3063, 491); // left
         addSpikeToWorld("/com/game/onespike.png", 3248, 491); // right
         addSpikeToWorld("/com/game/onespike.png", 3441, 380); // middle
-
+        addSpikeToWorld("/com/game/onespike.png", 3941, 303); // middle
+        addSpikeToWorld("/com/game/onespike.png", 4016, 708); // midlle
+        addSpikeToWorld("/com/game/onespike.png", 4198, 815); // midlle
+        addSpikeToWorld("/com/game/onespike.png", 4198, 221); // left
+        addSpikeToWorld("/com/game/onespike.png", 4338, 221); // midlle
+        addSpikeToWorld("/com/game/onespike.png", 4482, 221); // right
+        addSpikeToWorld("/com/game/onespike.png", 4948, 438); // midlle
+        addSpikeToWorld("/com/game/onespike.png", 5263, 698); // midlle
+        addSpikeToWorld("/com/game/onespike.png", 5332, 208); // midlle
+        addSpikeToWorld("/com/game/onespike.png", 5134, 74); // left
+        addSpikeToWorld("/com/game/onespike.png", 5308, 74); // right
 
         // Set enemy image
         spawnEnemies();
@@ -322,12 +329,18 @@ public class GameController {
     public void onKeyPressed(KeyEvent event) {
         double currentX = player.getLayoutX();
         double moveAmount = playerStats.moveSpeed; // Amount to move left/right
+        double playerWidth = player.getBoundsInParent().getWidth();
+        double minX = 0; // Left edge of the world
+        double maxX = 7270 - playerWidth; // Right edge of world - player width
+
         // Updated options to use left/right arrow keys or A/D keys
         switch (event.getCode()) {
             case LEFT:
             case A:
                 if (!isCollidingHorizontally(currentX - moveAmount)) {
-                    player.setLayoutX(currentX - moveAmount);
+                    double newX = currentX - moveAmount;
+                    newX = Math.max(minX, newX); // clamp to min
+                    player.setLayoutX(newX);
                     updateCamera(); // Update camera position
                     playerStats.setFacingRight(false); 
                 }
@@ -335,7 +348,9 @@ public class GameController {
             case RIGHT:
             case D:
                 if (!isCollidingHorizontally(currentX + moveAmount)) {
-                    player.setLayoutX(currentX + moveAmount);
+                    double newX = currentX + moveAmount;
+                    newX = Math.min(maxX, newX); // clamp to max
+                    player.setLayoutX(newX);
                     updateCamera(); // Update camera position
                     playerStats.setFacingRight(true); 
                 }
@@ -420,12 +435,13 @@ public class GameController {
             double enemyX = enemy.getBoundsInParent().getMinX();
             double enemyY = enemy.getBoundsInParent().getMinY();
             double enemyRight = enemy.getBoundsInParent().getMaxX();
-            double range = 110;
+            double range = 115;
 
             double playerRight = playerX + range;
             double playerLeft = playerX - range;
 
             // Depending on if player is facing left or right, checks
+            // MAKE SURE PLAYER FACES DIRECTION OF ENEMY WHEN ATTACKING
             // if enemy is n that attack direction 
             boolean inRange = playerStats.isFacingRight()
                 ? enemyX <= playerRight && enemyRight >= playerX
@@ -435,6 +451,22 @@ public class GameController {
             if (inRange && Math.abs(playerY - enemyY) < 50) {
                 int damage = playerStats.getPower();
                 stats.takeDamage(damage);
+
+                // Blood splatter effect instead of sword too lazy. So, green blood (not too graphic)
+                ImageView blood = new ImageView(new Image(getClass().getResource("/com/game/blood.png").toExternalForm()));
+                blood.setFitWidth(50); 
+                blood.setFitHeight(50);
+                blood.setLayoutX(enemy.getLayoutX()); // center near enemy
+                blood.setLayoutY(enemy.getLayoutY());
+                world.getChildren().add(blood); 
+
+                // Clean up the blood after 500ms
+                Timeline removeBlood = new Timeline(
+                    new KeyFrame(Duration.millis(500), e -> world.getChildren().remove(blood))
+                );
+                removeBlood.setCycleCount(1);
+                removeBlood.play();
+                
                 updateEnemyHealthLabel(i);
                 System.out.println("Hit enemy " + i + "! HP now: " + stats.currentHealth);
                 break; // only hit one enemy per swing
@@ -775,8 +807,8 @@ public class GameController {
         keyImage.setLayoutY(y);
         keyImage.setVisible(true);
         keyImage.setOpacity(1.0);
-        keyImage.toFront();
         world.getChildren().add(keyImage);
+        keyImage.toFront();
         System.out.println("Key dropped at: " + x + ", " + y);
         System.out.println("Key visibility: " + keyImage.isVisible());
 
@@ -906,7 +938,7 @@ public class GameController {
         AnchorPane rootPane = (AnchorPane) gameView.getParent();
 
         // Pause for "dramatic effect" (1 second)
-        PauseTransition delay = new PauseTransition(Duration.seconds(1));
+        PauseTransition delay = new PauseTransition(Duration.seconds(.5));
         delay.setOnFinished(event -> {
             VBox menu = new VBox(20);
             menu.setAlignment(Pos.CENTER);

@@ -2,13 +2,13 @@ package com.game;
 
 public class Enemy extends Character {
     private long lastDamageTime = 0; // Las time it hurt player
-    private long damageCooldown = 1000; // Cooldown time in milliseconds (1 sec)
+    private long damageCooldown = 2000; // Cooldown time in milliseconds (2 sec)
 
     public Enemy() {
         this.maxHealth = 15;
         this.currentHealth = maxHealth;
         this.power = 1;
-        this.moveSpeed = 1;
+        this.moveSpeed = .7;
         this.isDead = false;
     }
 

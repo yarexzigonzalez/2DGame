@@ -167,22 +167,22 @@
             <!-- Wall Obstacle -->
             <ImageView fx:id="wall1" layoutX="1092" layoutY="372" fitWidth="135" fitHeight="609" preserveRatio="false">
                 <image>
-                    <Image url="@/com/game/platform.png"/>
+                    <Image url="@/com/game/wall.png"/>
                 </image>
              </ImageView>
             <ImageView fx:id="wall2" layoutX="1387" layoutY="-30" fitWidth="135" fitHeight="609" preserveRatio="false">
                 <image>
-                    <Image url="@/com/game/platform.png"/>
+                    <Image url="@/com/game/wall.png"/>
                 </image>
             </ImageView>
             <ImageView fx:id="wall3" layoutX="2509" layoutY="0" fitWidth="313" fitHeight="496" preserveRatio="false">
                 <image>
-                    <Image url="@/com/game/platform.png"/>
+                    <Image url="@/com/game/wall.png"/>
                 </image>
             </ImageView>
             <ImageView fx:id="wall4" layoutX="5450" layoutY="111" fitWidth="135" fitHeight="872" preserveRatio="false">
                 <image>
-                    <Image url="@/com/game/platform.png"/>
+                    <Image url="@/com/game/wall.png"/>
                 </image>
             </ImageView>
 

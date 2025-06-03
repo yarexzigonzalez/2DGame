@@ -1,7 +1,9 @@
 package com.game; 
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
@@ -33,8 +35,7 @@ public class GameController {
     private boolean doorOpened = false;
     private ImageView babyImage;
     private boolean babySpawned = false;
-    @FXML
-    private Button inventoryButton;
+   
     @FXML
     private Label healthLabel;
     @FXML
@@ -50,17 +51,19 @@ public class GameController {
     private double velocityY = 0;
     private final double gravity = 0.5; // Gravity strength can adjust
     private final double jumpStrength = -15; // (suggested by ashley)
-    private final double maxFallSpeed = 15; // Maximum falling speed can adjust
-    // (Ashley's suggestion)
+    private final double maxFallSpeed = 3; //(better for jumping "over" spikes)
+  
     @FXML
     private ImageView groundPlatform, groundPlatform2, groundPlatform3, groundPlatform4;
     @FXML
-    private ImageView wall;
+    private ImageView wall1, wall2, wall4;
     @FXML 
     private ImageView floatingPlatform, floatingPlatform2, floatingPlatform3, floatingPlatform4, 
     floatingPlatform5, floatingPlatform6, floatingPlatform7, floatingPlatform8, floatingPlatform9, 
     floatingPlatform10, floatingPlatform11, floatingPlatform12, floatingPlatform13, floatingPlatform14,
-    floatingPlatform15; 
+    floatingPlatform15, floatingPlatform16, floatingPlatform17, floatingPlatform18, floatingPlatform19,
+    floatingPlatform20, floatingPlatform21, floatingPlatform22, floatingPlatform23, floatingPlatform24,
+    floatingPlatform25, floatingPlatform26; 
     @FXML
     private ImageView water;
    
@@ -87,6 +90,8 @@ public class GameController {
     private long timeTaken; // milliseconds
 
     private boolean deathHandled = false;
+    private boolean canAttack = true;
+    private final int attackCooldownMillis = 500;
 // ------------------------------------------------------------------------------------
 
     @FXML
@@ -126,7 +131,10 @@ public class GameController {
             floatingPlatform2, floatingPlatform3, floatingPlatform4, floatingPlatform5,
             floatingPlatform6, floatingPlatform7, floatingPlatform8, floatingPlatform9,
             floatingPlatform10, floatingPlatform11, floatingPlatform12, floatingPlatform13,
-            floatingPlatform14, wall, floatingPlatform15
+            floatingPlatform14, wall1, wall2, wall4, floatingPlatform15, floatingPlatform16, 
+            floatingPlatform17, floatingPlatform18, floatingPlatform19, floatingPlatform20,
+            floatingPlatform21, floatingPlatform22, floatingPlatform23, floatingPlatform24, 
+            floatingPlatform25, floatingPlatform26
         );
 
         // Add potions dynamically
@@ -135,8 +143,8 @@ public class GameController {
         Potion speedPotion = new SpeedPotion("Speed Potion", "/com/game/speedPotion.PNG", 2, 5);
         // For testing (change later)
         Potion dPotion2 = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG",10, 10);
-        double healthPotionX = wall.getLayoutX() + 50; 
-        double healthPotionY = wall.getLayoutY() - 55;
+        double healthPotionX = wall4.getLayoutX() + 50; 
+        double healthPotionY = wall4.getLayoutY() - 55;
         double speedPotionX = floatingPlatform8.getLayoutX() + 50; 
         double speedPotionY = floatingPlatform8.getLayoutY() - 55;
         double damagePotionX = floatingPlatform3.getLayoutX() + 50; 
@@ -147,20 +155,18 @@ public class GameController {
         addPotionToWorld(damagePotion, damagePotionX, damagePotionY);
         addPotionToWorld(speedPotion, speedPotionX, speedPotionY);
         addPotionToWorld(dPotion2,dPotion2X, dPotion2Y);
-        // Add spikes to the world
-        // Far left 
-        addSpikeToWorld("/com/game/onespike.png", floatingPlatform5.getLayoutX(), floatingPlatform5.getLayoutY() - 60);
-        // Far right 
-        addSpikeToWorld("/com/game/onespike.png", floatingPlatform5.getLayoutX() + floatingPlatform5.getFitWidth() - 50, floatingPlatform5.getLayoutY() - 60);
-        // Middle of ground platform
-        double middleGroundX = groundPlatform4.getLayoutX() + (groundPlatform.getFitWidth() / 2) - 40;
-        addSpikeToWorld("/com/game/spikes.png", middleGroundX, groundPlatform.getLayoutY() - 45);
-        // Floating platform 7
-        addSpikeToWorld("/com/game/onespike.png", floatingPlatform7.getLayoutX() + 20, floatingPlatform7.getLayoutY() - 60);
-        // Edge of floatingPlatform12
-        addSpikeToWorld("/com/game/onespike.png", floatingPlatform12.getLayoutX(), floatingPlatform12.getLayoutY() - 60);
-        // Edge of floatingPlatform11
-        addSpikeToWorld("/com/game/onespike.png", floatingPlatform11.getLayoutX() + floatingPlatform11.getFitWidth() - 50, floatingPlatform11.getLayoutY() - 60);
+        // Add spikes to the world (x-23, y-31) L to R across game screen
+        addSpikeToWorld("/com/game/onespike.png", 1685, 743); // far left
+        addSpikeToWorld("/com/game/onespike.png", 2030,743 ); // far right
+        addSpikeToWorld("/com/game/onespike.png", 1855, 623); // middle 
+        addSpikeToWorld("/com/game/onespike.png", 2238, 451); // middle
+        addSpikeToWorld("/com/game/onespike.png", 2506,623); //left
+        addSpikeToWorld("/com/game/upsideDSpike.png", 2643, 495); // top
+        addSpikeToWorld("/com/game/onespike.png", 2779, 623); // right
+        addSpikeToWorld("/com/game/onespike.png", 3063, 491); // left
+        addSpikeToWorld("/com/game/onespike.png", 3248, 491); // right
+        addSpikeToWorld("/com/game/onespike.png", 3441, 380); // middle
+
 
         // Set enemy image
         spawnEnemies();
@@ -390,20 +396,32 @@ public class GameController {
 // --------------------------------------------------------------------------------
 
     // No visual atm still
+
     private void swingSword() {
+        if (!canAttack) return;
+
+        canAttack = false;
+
+        // Cooldown timer 
+        Timeline cooldownTimer = new Timeline(
+            new KeyFrame(Duration.millis(attackCooldownMillis), e -> canAttack = true)
+        );
+        cooldownTimer.setCycleCount(1);
+        cooldownTimer.play();
+
         for (int i = 0; i < enemies.size(); i++) {
             ImageView enemy = enemies.get(i);
             Enemy stats = enemyStats.get(i);
-    
+
             if (stats.isDead) continue; // skip if already deaad
-    
+
             double playerX = player.getBoundsInParent().getMinX();
             double playerY = player.getBoundsInParent().getMinY();
             double enemyX = enemy.getBoundsInParent().getMinX();
             double enemyY = enemy.getBoundsInParent().getMinY();
             double enemyRight = enemy.getBoundsInParent().getMaxX();
             double range = 110;
-    
+
             double playerRight = playerX + range;
             double playerLeft = playerX - range;
 
@@ -412,7 +430,7 @@ public class GameController {
             boolean inRange = playerStats.isFacingRight()
                 ? enemyX <= playerRight && enemyRight >= playerX
                 : enemyRight >= playerLeft && enemyX <= playerX;
-            
+
             // Enemy is close horizontally and about same height
             if (inRange && Math.abs(playerY - enemyY) < 50) {
                 int damage = playerStats.getPower();
@@ -423,7 +441,7 @@ public class GameController {
             }
         }
     }
-    
+
     // Updates enemy's HP label/bar after taking damage
     private void updateEnemyHealthLabel(int i) {
         Enemy stats = enemyStats.get(i);
@@ -431,7 +449,6 @@ public class GameController {
         double percent = (double) stats.currentHealth / stats.maxHealth;
         enemyHealthBars.get(i).setWidth(percent * 50);
     }
-    
 
 // --------------------------------------------------------------------------------
 
@@ -633,8 +650,8 @@ public class GameController {
 
     private void addSpikeToWorld(String imagePath, double x, double y) {
         ImageView spike = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
-        spike.setFitWidth(60); 
-        spike.setFitHeight(60); 
+        spike.setFitWidth(40); 
+        spike.setFitHeight(40); 
         spike.setLayoutX(x);
         spike.setLayoutY(y);
         world.getChildren().add(spike);
@@ -679,11 +696,12 @@ public class GameController {
     // Basically, enemies get placed and know where to walk (limit their movement)
     // Don't walk on water anymore/float
     private void spawnEnemies() {
-    spawnEnemy(860, 940, 610, 1132); // X/Y + patrol min/max
-    spawnEnemy(1433, 940, 1132, 1670);
-    spawnEnemy(2730, 940, 2395, 3811);
+    spawnEnemy(860, 940, 610, 1032); // X/Y + patrol min/max
+    spawnEnemy(1433, 940, 1238, 1662);
+    spawnEnemy(2730, 623, 2395, 3811);
     spawnEnemy(4627, 940, 4333, 5400);
     spawnBoss(5700, 900, 5605, 7270);
+    spawnEnemy(809, 594,617, 1015);
     }
     // Enemy also spawned with image, health bar, and label    
     private void spawnEnemy(double x, double y, double patrolMinX, double patrolMaxX) {

@@ -21,10 +21,11 @@ public class GameApp extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("GameView.fxml"));
         Parent root = loader.load();
     
-        Scene scene = new Scene(root);
+        int ViewWidth = 1900;
+        int ViewHeight = 1080;
+        Scene scene = new Scene(root, ViewWidth, ViewHeight); // window size
         stage.setScene(scene);
         stage.setTitle("2D Platformer");
-        //stage.setFullScreen(true); // Set the game to full screen
         stage.show();
 
         root.requestFocus(); // Request focus for the root node to capture key events   

@@ -17,16 +17,13 @@ public class GameApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        /*Parent root = FXMLLoader.load(getClass().getResource("/com/game/GameView.fxml"));
-        Scene scene = new Scene(root, 800, 600);
-        stage.setTitle("2D Platformer Game");
-        stage.setScene(scene);
-        stage.show(); not this , try below works*/
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("GameView.fxml"));
         Parent root = loader.load();
     
-        Scene scene = new Scene(root);
+        int ViewWidth = 1900;
+        int ViewHeight = 1080;
+        Scene scene = new Scene(root, ViewWidth, ViewHeight); // window size
         stage.setScene(scene);
         stage.setTitle("2D Platformer");
         stage.show();

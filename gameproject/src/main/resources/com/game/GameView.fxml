@@ -4,24 +4,222 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.game.GameController"
-            prefWidth="800" prefHeight="600"
+            prefWidth="6361" prefHeight="1080"
             onKeyPressed="#onKeyPressed"
             focusTraversable="true">
+    <!-- Camera/View Group -->
+    <Group fx:id="gameView" layoutX="0" layoutY="0">
 
-    <!-- Player -->
-    <Rectangle fx:id="player" x="100" y="500" width="40" height="40" fill="blue"/>
+        <!-- Background -->
+        <ImageView fitWidth="6361" fitHeight="1080" preserveRatio="false">
+            <image>
+                <Image url="@/com/game/background.png"/>
+            </image>
+        </ImageView>
 
-    <!-- Ground Platform -->
-    <Rectangle layoutX="0" layoutY="550" width="800" height="50" fill="darkgreen"/>
+        <!-- Game world pane (part that gon move) -->
+        <Pane fx:id="world" prefWidth="6366" prefHeight="1080">
 
-    <!-- Floating Platform -->
-    <Rectangle layoutX="300" layoutY="400" width="150" height="20" fill="darkslateblue"/>
+            <!-- Water -->
+            <ImageView fx:id="water" layoutX="0" layoutY="1000" fitWidth="5361" fitHeight="80" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/water.png"/>
+                </image>
+            </ImageView>
+            
+            <!-- Floating Platforms -->
+            <ImageView fx:id="floatingPlatform" layoutX="300" layoutY="850" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform2" layoutX="535" layoutY="850" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform3" layoutX="422" layoutY="734" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform4" layoutX="610" layoutY="634" fitWidth="437" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform5" layoutX="897" layoutY="491" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform6" layoutX="1508" layoutY="880" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform7" layoutX="1659" layoutY="783" fitWidth="430" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform8" layoutX="1652" layoutY="567" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform9" layoutX="1803" layoutY="664" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform10" layoutX="1966" layoutY="569" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform11" layoutX="2186" layoutY="492" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform12" layoutX="2960" layoutY="531" fitWidth="430" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform13" layoutX="3389" layoutY="421" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform14" layoutX="3651" layoutY="421" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform15" layoutX="3889" layoutY="344" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform16" layoutX="3964" layoutY="750" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform17" layoutX="4146" layoutY="857" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform18" layoutX="4146" layoutY="262" fitWidth="430" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform19" layoutX="4700" layoutY="344" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform20" layoutX="5054" layoutY="843" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform21" layoutX="5208" layoutY="739" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform22" layoutX="5054" layoutY="606" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform23" layoutX="4898" layoutY="478" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform24" layoutX="5054" layoutY="366" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform25" layoutX="5280" layoutY="247" fitWidth="150" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="floatingPlatform26" layoutX="5054" layoutY="111" fitWidth="418" fitHeight="20" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <!-- Wall Obstacle -->
+            <ImageView fx:id="wall1" layoutX="1092" layoutY="372" fitWidth="135" fitHeight="609" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/wall.png"/>
+                </image>
+             </ImageView>
+            <ImageView fx:id="wall2" layoutX="1387" layoutY="-30" fitWidth="135" fitHeight="609" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/wall.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="wall3" layoutX="2509" layoutY="0" fitWidth="313" fitHeight="496" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/wall.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="wall4" layoutX="5450" layoutY="111" fitWidth="135" fitHeight="872" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/wall.png"/>
+                </image>
+            </ImageView>
 
-    <!-- UI: Health & Inventory -->
-    <Label fx:id="healthLabel" layoutX="20" layoutY="20" text="Health: 3" style="-fx-font-size: 18;"/>
-    <Button fx:id="inventoryButton" layoutX="700" layoutY="20" text="Inventory" onAction="#openInventory"/>
+            <!-- Player -->
+            <ImageView fx:id="player" layoutX="100" layoutY="850"/>
 
+            <!-- Ground Platforms -->
+            <ImageView fx:id="groundPlatform" layoutX="-115" layoutY="980" fitWidth="490" fitHeight="100" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="groundPlatform2" layoutX="610" layoutY="980" fitWidth="1098" fitHeight="100" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="groundPlatform3" layoutX="2395" layoutY="664" fitWidth="1489" fitHeight="416" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+            <ImageView fx:id="groundPlatform4" layoutX="4333" layoutY="980" fitWidth="4034" fitHeight="100" preserveRatio="false">
+                <image>
+                    <Image url="@/com/game/platform.png"/>
+                </image>
+            </ImageView>
+        </Pane>
+    </Group>
+
+    <!-- UI: Health & Inventory (stays fixed on screen)-->
+    <Rectangle fx:id="healthBar" fill="LimeGreen" x="20" y="20" width="200" height="20"/>
+    <Label fx:id="healthLabel" layoutX="30" layoutY="20" text="Health: 3" style="-fx-font-size: 18;"/>
+    <Label fx:id="healLabel" layoutX="700" layoutY="20" text="" 
+       style="-fx-font-size: 18; -fx-background-color: rgba(49, 192, 214, 0.9); -fx-text-fill: white; -fx-padding: 5px;"/>
+    <Label fx:id="speedLabel" layoutX="900" layoutY="20" text="" 
+        style="-fx-font-size: 18; -fx-background-color: rgba(255, 238, 0, 0.6); -fx-text-fill: white; -fx-padding: 5px;"/>
+    <Label fx:id="damageLabel" layoutX="1100" layoutY="20" text="" 
+        style="-fx-font-size: 18; -fx-background-color: rgba(206, 0, 0, 0.6); -fx-text-fill: white; -fx-padding: 5px;"/>
 </AnchorPane>

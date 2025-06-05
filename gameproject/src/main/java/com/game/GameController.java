@@ -151,7 +151,7 @@ public class GameController {
         Potion speedPotion = new SpeedPotion("Speed Potion", "/com/game/speedPotion.PNG", 3, 5);
      
         // Near boss
-        Potion dPotion2 = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG",12, 10);
+        Potion dPotion2 = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG",10, 10);
         Potion hP2 = new HealthPotion("Health Potion", "/com/game/healthPotion.PNG", 15);
         addPotionToWorld(healthPotion, 1730, 528);
         addPotionToWorld(damagePotion, 685, 952);
@@ -875,8 +875,8 @@ public class GameController {
         rescuedLabel.setLayoutY(424);  
         world.getChildren().add(rescuedLabel);
 
-        // Wait 7 seconds then show end screen
-        PauseTransition delay = new PauseTransition(Duration.seconds(7));
+        // Wait 7 seconds then show end screen so that player and baby can move
+        PauseTransition delay = new PauseTransition(Duration.seconds(6));
         // Using lambda shorthand to handle what happens when timer done
         // cleaner way to handle events basically
         delay.setOnFinished(e -> {

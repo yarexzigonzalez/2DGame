@@ -203,7 +203,7 @@
             </ImageView>
             <ImageView fx:id="groundPlatform3" layoutX="2395" layoutY="664" fitWidth="1489" fitHeight="416" preserveRatio="false">
                 <image>
-                    <Image url="@/com/game/platform.png"/>
+                    <Image url="@/com/game/bigPlatform.png"/>
                 </image>
             </ImageView>
             <ImageView fx:id="groundPlatform4" layoutX="4333" layoutY="980" fitWidth="4034" fitHeight="100" preserveRatio="false">

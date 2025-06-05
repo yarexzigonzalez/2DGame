@@ -56,7 +56,7 @@ public class GameController {
     @FXML
     private ImageView groundPlatform, groundPlatform2, groundPlatform3, groundPlatform4;
     @FXML
-    private ImageView wall1, wall2, wall4;
+    private ImageView wall1, wall2, wall3, wall4;
     @FXML 
     private ImageView floatingPlatform, floatingPlatform2, floatingPlatform3, floatingPlatform4, 
     floatingPlatform5, floatingPlatform6, floatingPlatform7, floatingPlatform8, floatingPlatform9, 

@@ -543,6 +543,7 @@ public class GameController {
         System.out.println("Restarting game...");
 
         deathHandled = false;
+        restartPromptShown = false; // need to add for the pop up to show up after clicking play again
 
         // Player x and y positions
         double startingX = 100; // Starting X position of player
@@ -574,7 +575,7 @@ public class GameController {
             healthLabel.setVisible(true);
             healthLabel.setText("HP: " + stats.currentHealth);
         }
-        
+
         // Reset player stats
         playerStats.power = 1; 
         playerStats.moveSpeed = 20;
@@ -596,6 +597,7 @@ public class GameController {
             keyImage.setLayoutY(-100);
         }
         hasKey = false;
+        keyDropped = false;
 
         // Reset Door
         if (doorImage != null) {

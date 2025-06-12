@@ -171,7 +171,7 @@
                     <Image url="@/com/game/wall.png"/>
                 </image>
              </ImageView>
-            <ImageView fx:id="wall2" layoutX="1387" layoutY="-30" fitWidth="135" fitHeight="609" preserveRatio="false">
+            <ImageView fx:id="wall2" layoutX="1387" layoutY="0" fitWidth="135" fitHeight="609" preserveRatio="false">
                 <image>
                     <Image url="@/com/game/wallUp.png"/>
                 </image>
@@ -191,7 +191,7 @@
             <ImageView fx:id="player" layoutX="100" layoutY="850"/>
 
             <!-- Ground Platforms -->
-            <ImageView fx:id="groundPlatform" layoutX="-115" layoutY="980" fitWidth="490" fitHeight="100" preserveRatio="false">
+            <ImageView fx:id="groundPlatform" layoutX="0" layoutY="980" fitWidth="300" fitHeight="100" preserveRatio="false">
                 <image>
                     <Image url="@/com/game/platform.png"/>
                 </image>

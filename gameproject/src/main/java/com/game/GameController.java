@@ -7,6 +7,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -18,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -107,13 +109,15 @@ public class GameController {
         }
 
         // Player
-        Image playerImage = new Image(getClass().getResourceAsStream("/com/game/player.PNG"));
+        //Image playerImage = new Image(getClass().getResourceAsStream("/com/game/player.png"));
+        Image playerImage = safeLoad("/com/game/player.png");
         player.setImage(playerImage);
         player.setFitWidth(50);
         player.setFitHeight(50);
 
         // Door
-        doorImage = new ImageView(new Image("/com/game/door.png"));
+        //doorImage = new ImageView(new Image("/com/game/door.png"));
+        doorImage = new ImageView(safeLoad("/com/game/door.png"));
         doorImage.setFitWidth(60);
         doorImage.setFitHeight(80);
         doorImage.setLayoutX(7270); // replace with actual coords
@@ -146,13 +150,13 @@ public class GameController {
         );
 
         // Add potions dynamically
-        Potion healthPotion = new HealthPotion("Health Potion", "/com/game/healthPotion.PNG", 10);
-        Potion damagePotion = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG", 3, 5);
-        Potion speedPotion = new SpeedPotion("Speed Potion", "/com/game/speedPotion.PNG", 3, 5);
+        Potion healthPotion = new HealthPotion("Health Potion", "/com/game/healthPotion.png", 10);
+        Potion damagePotion = new DamagePotion("Damage Potion", "/com/game/damagePotion.png", 3, 5);
+        Potion speedPotion = new SpeedPotion("Speed Potion", "/com/game/speedPotion.png", 3, 5);
      
         // Near boss
-        Potion dPotion2 = new DamagePotion("Damage Potion", "/com/game/damagePotion.PNG",10, 10);
-        Potion hP2 = new HealthPotion("Health Potion", "/com/game/healthPotion.PNG", 15);
+        Potion dPotion2 = new DamagePotion("Damage Potion", "/com/game/damagePotion.png",10, 10);
+        Potion hP2 = new HealthPotion("Health Potion", "/com/game/healthPotion.png", 15);
         addPotionToWorld(healthPotion, 1730, 528);
         addPotionToWorld(damagePotion, 685, 952);
         addPotionToWorld(speedPotion, 2988, 490);
@@ -161,27 +165,27 @@ public class GameController {
    
        
         // Add spikes to the world (x-23, y-31) L to R across game screen
-        addSpikeToWorld("/com/game/onespike.png", 1685, 743); // far left
-        addSpikeToWorld("/com/game/onespike.png", 2030,743 ); // far right
-        addSpikeToWorld("/com/game/onespike.png", 1855, 623); // middle 
-        addSpikeToWorld("/com/game/onespike.png", 2238, 451); // middle
-        addSpikeToWorld("/com/game/onespike.png", 2506,623); //left
+        addSpikeToWorld("/com/game/oneSpike.png", 1685, 743); // far left
+        addSpikeToWorld("/com/game/oneSpike.png", 2030,743 ); // far right
+        addSpikeToWorld("/com/game/oneSpike.png", 1855, 623); // middle 
+        addSpikeToWorld("/com/game/oneSpike.png", 2238, 451); // middle
+        addSpikeToWorld("/com/game/oneSpike.png", 2506,623); //left
         addSpikeToWorld("/com/game/upsideDSpike.png", 2643, 495); // top
-        addSpikeToWorld("/com/game/onespike.png", 2779, 623); // right
-        addSpikeToWorld("/com/game/onespike.png", 3063, 491); // left
-        addSpikeToWorld("/com/game/onespike.png", 3248, 491); // right
-        addSpikeToWorld("/com/game/onespike.png", 3441, 380); // middle
-        addSpikeToWorld("/com/game/onespike.png", 3941, 303); // middle
-        addSpikeToWorld("/com/game/onespike.png", 4016, 708); // midlle
-        addSpikeToWorld("/com/game/onespike.png", 4198, 815); // midlle
-        addSpikeToWorld("/com/game/onespike.png", 4198, 221); // left
-        addSpikeToWorld("/com/game/onespike.png", 4338, 221); // midlle
-        addSpikeToWorld("/com/game/onespike.png", 4482, 221); // right
-        addSpikeToWorld("/com/game/onespike.png", 4948, 438); // midlle
-        addSpikeToWorld("/com/game/onespike.png", 5263, 698); // midlle
-        addSpikeToWorld("/com/game/onespike.png", 5332, 208); // midlle
-        addSpikeToWorld("/com/game/onespike.png", 5134, 74); // left
-        addSpikeToWorld("/com/game/onespike.png", 5308, 74); // right
+        addSpikeToWorld("/com/game/oneSpike.png", 2779, 623); // right
+        addSpikeToWorld("/com/game/oneSpike.png", 3063, 491); // left
+        addSpikeToWorld("/com/game/oneSpike.png", 3248, 491); // right
+        addSpikeToWorld("/com/game/oneSpike.png", 3441, 380); // middle
+        addSpikeToWorld("/com/game/oneSpike.png", 3941, 303); // middle
+        addSpikeToWorld("/com/game/oneSpike.png", 4016, 708); // midlle
+        addSpikeToWorld("/com/game/oneSpike.png", 4198, 815); // midlle
+        addSpikeToWorld("/com/game/oneSpike.png", 4198, 221); // left
+        addSpikeToWorld("/com/game/oneSpike.png", 4338, 221); // midlle
+        addSpikeToWorld("/com/game/oneSpike.png", 4482, 221); // right
+        addSpikeToWorld("/com/game/oneSpike.png", 4948, 438); // midlle
+        addSpikeToWorld("/com/game/oneSpike.png", 5263, 698); // midlle
+        addSpikeToWorld("/com/game/oneSpike.png", 5332, 208); // midlle
+        addSpikeToWorld("/com/game/oneSpike.png", 5134, 74); // left
+        addSpikeToWorld("/com/game/oneSpike.png", 5308, 74); // right
 
         // Set enemy image
         spawnEnemies();
@@ -206,6 +210,20 @@ public class GameController {
         };
         timer.start();
     }
+
+// ------------------------------------------------------------------------------------------
+    
+    // For debugging purposes
+    private Image safeLoad(String path) {
+        InputStream stream = getClass().getResourceAsStream(path);
+        if (stream == null) {
+            System.err.println("Image not found: " + path);
+            throw new RuntimeException("Failed to load image at path: " + path);
+        }
+        //System.out.println("Loaded image: " + path);
+        return new Image(stream);
+    }
+
 
 // ------------------------------------------------------------------------------------
 
@@ -417,7 +435,8 @@ public class GameController {
         double cameraX = playerX - (ViewWidth / 2);
         
         // Clamp camera so it doesn't go out of bounds like the edges of the world
-        cameraX = Math.max(0, Math.min(cameraX, WorldWidth - ViewWidth));
+        double scrollPadding = 550; // Just some extra room
+        cameraX = Math.max(0, Math.min(cameraX, WorldWidth - ViewWidth + scrollPadding));
         // Move world pane left/right to follow player
         // So player moves right and world moves left
         world.setLayoutX(-cameraX);
@@ -577,8 +596,8 @@ public class GameController {
         }
 
         // Reset player stats
-        playerStats.power = 1; 
-        playerStats.moveSpeed = 20;
+        playerStats.power = playerStats.getPower(); // Reset to default power
+        playerStats.moveSpeed = playerStats.getMoveSpeed(); // Reset to default speed
 
         // Reset potion
         for (int i = 0; i < potionImages.size(); i++) {
@@ -630,7 +649,8 @@ public class GameController {
 // --------------------------------------------------------------------------------
 
     private void addPotionToWorld(Potion potion, double x, double y) {
-        ImageView imageView = new ImageView(new Image(getClass().getResource(potion.getImagePath()).toExternalForm()));
+        //ImageView imageView = new ImageView(new Image(getClass().getResource(potion.getImagePath()).toExternalForm()));
+        ImageView imageView = new ImageView(safeLoad(potion.getImagePath()));
         imageView.setFitWidth(32);
         imageView.setFitHeight(32);
         imageView.setLayoutX(x);
@@ -698,7 +718,9 @@ public class GameController {
 // --------------------------------------------------------------------------------
 
     private void addSpikeToWorld(String imagePath, double x, double y) {
-        ImageView spike = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
+        //ImageView spike = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
+        ImageView spike = new ImageView(safeLoad(imagePath));
+
         spike.setFitWidth(40); 
         spike.setFitHeight(40); 
         spike.setLayoutX(x);
@@ -870,10 +892,10 @@ public class GameController {
         // Show "BABY RESCUED!" label at the top center of the screen
         Label rescuedLabel = new Label("BABY RESCUED!");
         rescuedLabel.setStyle(
-        "-fx-font-size: 36px; " +
+        "-fx-font-size: 50px; " +
         "-fx-font-family: 'Impact'; " +
         "-fx-text-fill: white;");
-        rescuedLabel.setLayoutX(6282); 
+        rescuedLabel.setLayoutX(6580); 
         rescuedLabel.setLayoutY(424);  
         world.getChildren().add(rescuedLabel);
 
@@ -915,7 +937,7 @@ public class GameController {
 
         // Menu VBox
         VBox menu = new VBox(20);
-        menu.setAlignment(Pos.CENTER);
+        //menu.setAlignment(Pos.CENTER);
         menu.setStyle("-fx-background-color: transparent;");
 
         Label completeLabel = new Label("Level 1 Complete!");
@@ -935,12 +957,22 @@ public class GameController {
             "-fx-font-family: 'Verdana'; " +
             "-fx-font-weight: bold; " +
             "-fx-text-fill: white;");
+        
+        // center timeLAvel
+        timeLabel.setTranslateX(ViewWidth / 2 - 330); // Center label horizontally
 
         Button playAgainBtn = new Button("Play Again");
         Button exitBtn = new Button("Exit");
 
         StackPane overlay = new StackPane(menu);
-        overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
+        //overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
+        overlay.setPrefWidth(3000); // a bit over just in case
+        overlay.setPrefHeight(1200); // covers whole screen so works
+        menu.setAlignment(Pos.CENTER_LEFT);
+        menu.setPadding(Insets.EMPTY);
+        menu.setTranslateX(500); 
+
+        overlay.setAlignment(menu, Pos.CENTER_LEFT); // keeps menu vertically centered inside overlay
         overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.85);");
 
         // Handles "Play Again" button clicked using lambda syntax 
@@ -948,10 +980,13 @@ public class GameController {
             rootPane.getChildren().remove(overlay); // remove whole overlay
             restartGame();
         });
+        playAgainBtn.setTranslateX(ViewWidth / 2 - 310); // Center button horizontally
+
         // Handles "Exit" button click using lambda syntax
         exitBtn.setOnAction(e -> {
             Platform.exit();
         });
+        exitBtn.setTranslateX(ViewWidth / 2 - 290); // Center button horizontally
 
         menu.getChildren().addAll(completeLabel, timeLabel, playAgainBtn, exitBtn);
 
@@ -965,8 +1000,8 @@ public class GameController {
     private void showDeathScreen() {
         AnchorPane rootPane = (AnchorPane) gameView.getParent();
 
-        VBox menu = new VBox(20);
-        menu.setAlignment(Pos.CENTER);
+        VBox menu = new VBox(30);
+        //menu.setAlignment(Pos.CENTER);
         menu.setStyle("-fx-background-color: transparent;");
 
         Label deathLabel = new Label("YOU DIED");
@@ -985,17 +1020,26 @@ public class GameController {
         Button exitBtn = new Button("Exit");
 
         StackPane overlay = new StackPane(menu);
-        overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
+        //overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
+        overlay.setPrefWidth(3000); // a bit over just in case
+        overlay.setPrefHeight(1200); // covers whole screen so works
+        menu.setAlignment(Pos.CENTER_LEFT);
+        menu.setPadding(Insets.EMPTY);
+        menu.setTranslateX(500); 
+
+        overlay.setAlignment(menu, Pos.CENTER_LEFT); // keeps menu vertically centered inside overlay
         overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.85);");
 
         tryAgainBtn.setOnAction(e -> {
             rootPane.getChildren().remove(overlay); // Remove overlay
             restartGame();
         });
+        tryAgainBtn.setTranslateX(ViewWidth / 2 - 330); // Center button horizontally
 
         exitBtn.setOnAction(e -> {
             Platform.exit();
         });
+        exitBtn.setTranslateX(ViewWidth / 2 - 315); // Center button horizontally
 
         menu.getChildren().addAll(deathLabel, timeLabel, tryAgainBtn, exitBtn);
 
@@ -1009,7 +1053,7 @@ public class GameController {
         AnchorPane rootPane = (AnchorPane) gameView.getParent();
 
         VBox menu = new VBox(20);
-        menu.setAlignment(Pos.CENTER);
+        //menu.setAlignment(Pos.CENTER);
         menu.setStyle("-fx-background-color: transparent;");
 
         Label title = new Label("Level 1: Rescue the Baby");
@@ -1034,14 +1078,19 @@ public class GameController {
             "-fx-font-weight: bold; " +
             "-fx-text-fill: white;"
         );
-        
-
 
         Button startBtn = new Button("Start Game");
 
         StackPane overlay = new StackPane(menu);
-        overlay.prefWidthProperty().bind(rootPane.widthProperty());
-        overlay.prefHeightProperty().bind(rootPane.heightProperty());
+        //overlay.prefWidthProperty().bind(rootPane.widthProperty());
+        //overlay.prefHeightProperty().bind(rootPane.heightProperty());
+        overlay.setPrefWidth(3000); // a bit over just in case
+        overlay.setPrefHeight(1200); // covers whole screen so works
+        menu.setAlignment(Pos.CENTER_LEFT);
+        menu.setPadding(Insets.EMPTY); 
+        menu.setTranslateX(400); 
+
+        overlay.setAlignment(menu, Pos.CENTER_LEFT); // keeps menu vertically centered inside overlay
         overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.85);");
 
         startBtn.setOnAction(e -> {
@@ -1050,6 +1099,7 @@ public class GameController {
             gamePaused = false; // Unpause game loop
             startTime = System.currentTimeMillis(); // Start the game timer now
         });
+        startBtn.setTranslateX(ViewWidth / 2 - 200); // Center button horizontally
 
         menu.getChildren().addAll(title, objective, controls, startBtn);
         rootPane.getChildren().add(overlay);
@@ -1075,7 +1125,7 @@ public class GameController {
         AnchorPane rootPane = (AnchorPane) gameView.getParent();
 
         VBox messageBox = new VBox(20);
-        messageBox.setAlignment(Pos.CENTER);
+        //messageBox.setAlignment(Pos.CENTER);
         messageBox.setStyle("-fx-background-color: transparent;");
 
         Label warning = new Label("You must defeat ALL enemies before facing the boss!");
@@ -1088,15 +1138,25 @@ public class GameController {
         Button exit = new Button("Exit");
 
         StackPane overlay = new StackPane(messageBox);
-        overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
+        //overlay.setPrefSize(rootPane.getWidth(), rootPane.getHeight());
+        overlay.setPrefWidth(3000); // a bit over just in case
+        overlay.setPrefHeight(1200); // covers whole screen so works
+        messageBox.setAlignment(Pos.CENTER_LEFT);
+        messageBox.setPadding(Insets.EMPTY);
+        messageBox.setTranslateX(300); 
+
+        overlay.setAlignment(messageBox, Pos.CENTER_LEFT); // keeps menu vertically centered inside overlay
+
         overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.85);");
 
         tryAgain.setOnAction(e -> {
             rootPane.getChildren().remove(overlay);
             restartGame();
         });
+        tryAgain.setTranslateX(ViewWidth / 2 - 100); // Center button horizontally
         
         exit.setOnAction(e -> Platform.exit());
+        exit.setTranslateX(ViewWidth / 2 - 90); // Center button horizontally
 
         messageBox.getChildren().addAll(warning, tryAgain, exit);
         rootPane.getChildren().add(overlay);

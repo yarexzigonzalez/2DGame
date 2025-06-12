@@ -31,6 +31,14 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -46,8 +54,6 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>com.game.GameApp</mainClass> 
-                    <!-- Change this to your main class, i 
-                    forgot to change to com.game.GameApp, NOT com.example.App -->
                     <platform>mac-aarch64</platform> 
                 </configuration>
                 <executions>
@@ -57,6 +63,18 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.game.GameApp</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>

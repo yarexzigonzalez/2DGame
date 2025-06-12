@@ -6,7 +6,7 @@ public class Player extends Character{
     public Player(){
         this.currentHealth = 15;
         this.maxHealth = 15;
-        this.moveSpeed = 20;
+        this.moveSpeed = 18; 
         this.power = 1;
         this.isDead = false;
     }

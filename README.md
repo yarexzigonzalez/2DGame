@@ -21,7 +21,8 @@ It was our very first GUI-based game project — built with ambition, panic, and
    ```bash
    cd C:\Users\example\Downloads\gameproject
 4. Run the game using: 
-   (Make sure the JavaFX SDK path is accurate and points to the lib folder) ```
+   (Make sure the JavaFX SDK path is accurate and points to the lib folder)
+   ```
    java --module-path "C:\Users\example\Downloads\openjfx-24.0.1_windows-x64_bin-sdk\javafx-sdk-24.0.1\lib" --add-modules javafx.controls,javafx.fxml -jar game-1.0-SNAPSHOT.jar```
    
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -34,6 +35,7 @@ It was a group assignment, and I served as the **lead developer**, handling the 
 - JavaFX GUI structure
 - Character movement
 - Game mechanics
+
 Our original project scope was more ambitious, but we learned to scale it down due to time and complexity — a key lesson.
 
 ### Authors:
